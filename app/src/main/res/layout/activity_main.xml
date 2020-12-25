@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.easydarwin.easypusher.StreamActivity"
     android:background="#000000">
 
     <TextureView
@@ -45,6 +44,7 @@
             android:layout_alignTop="@+id/txt_res"
             android:id="@+id/spn_resolution"
             android:background="#00ffffff"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -87,6 +87,7 @@
             android:id="@+id/toolbar_about"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:visibility="gone"
             android:layout_gravity="end|center_vertical"
             android:layout_margin="4dp"
             android:onClick="onAbout"
@@ -124,12 +125,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:textColor="#fff"
-                android:text="推送" />
+                android:text="视频" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:visibility="gone"
             android:gravity="center_horizontal"
             android:id="@+id/push_screen_container"
             android:onClick="onPushScreen"

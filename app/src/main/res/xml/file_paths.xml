@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- external-path:sd ；path:你的应用保存文件的根目录；name随便定义-->
+    <!-- root-path 手机存储根目录 -->
+    <root-path
+        name="RTSP"
+        path="取证终端" />
+    <files-path
+        name="files"
+        path="files" />
+    <cache-path
+        name="cache"
+        path="files" />
+    <external-path
+        name="external"
+        path="files" />
+<!--   content://org.easydarwin.easyrtmp.fileProvider/YJZB/2020_05_07_21_54_08-0.mp4-->
+    <external-path
+        name="RTSP"
+        path="取证终端" />
+    <external-files-path
+        name="externalfiles"
+        path="files" />
+    <!-- 此标签需要 support 25.0.0以上才可以使用-->
+    <external-cache-path
+        name="externalcache"
+        path="files" />
+</paths>

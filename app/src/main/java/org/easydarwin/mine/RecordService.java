@@ -1,4 +1,4 @@
-package org.easydarwin.easypusher;
+package org.easydarwin.mine;
 
 import android.annotation.TargetApi;
 import android.app.Service;
@@ -31,6 +31,9 @@ import android.view.ViewConfiguration;
 import android.view.WindowManager;
 
 import org.easydarwin.audio.AudioStream;
+import org.easydarwin.easypusher.BuildConfig;
+import org.easydarwin.easypusher.R;
+import org.easydarwin.homepage.StreamActivity;
 import org.easydarwin.push.EasyPusher;
 import org.easydarwin.push.Pusher;
 import org.easydarwin.util.Config;

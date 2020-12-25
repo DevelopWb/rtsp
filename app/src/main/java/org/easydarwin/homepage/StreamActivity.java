@@ -5,7 +5,7 @@
 	Website: http://www.easydarwin.org
 */
 
-package org.easydarwin.easypusher;
+package org.easydarwin.homepage;
 
 import android.Manifest;
 import android.content.ComponentName;
@@ -38,29 +38,36 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.orhanobut.hawk.Hawk;
 import com.squareup.otto.Subscribe;
 
 import org.easydarwin.bus.StartRecord;
 import org.easydarwin.bus.StopRecord;
 import org.easydarwin.bus.StreamStat;
 import org.easydarwin.bus.SupportResolution;
+import org.easydarwin.mine.AboutActivity;
+import org.easydarwin.easypusher.BuildConfig;
+import org.easydarwin.MyApp;
+import org.easydarwin.easypusher.R;
+import org.easydarwin.mine.RecordService;
+import org.easydarwin.mine.SettingActivity;
 import org.easydarwin.push.EasyPusher;
 import org.easydarwin.push.InitCallback;
 import org.easydarwin.push.MediaStream;
 import org.easydarwin.update.UpdateMgr;
 import org.easydarwin.util.Config;
+import org.easydarwin.util.HawkProperty;
 import org.easydarwin.util.SPUtil;
 import org.easydarwin.util.Util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static org.easydarwin.easypusher.EasyApplication.BUS;
-import static org.easydarwin.easypusher.SettingActivity.REQUEST_OVERLAY_PERMISSION;
+import static org.easydarwin.MyApp.BUS;
+import static org.easydarwin.mine.SettingActivity.REQUEST_OVERLAY_PERMISSION;
 import static org.easydarwin.update.UpdateMgr.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE;
 
 /**
@@ -72,7 +79,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     public static final int REQUEST_MEDIA_PROJECTION = 1002;
     public static final int REQUEST_CAMERA_PERMISSION = 1003;
     public static final int REQUEST_STORAGE_PERMISSION = 1004;
-
+    private CharSequence[] resDisplay = new CharSequence[]{"640x480", "1280x720", "1920x1080", "2560x1440",
+            "3840x2160"};
     // 默认分辨率
     int width = 1280, height = 720;
 
@@ -86,9 +94,9 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
     MediaStream mMediaStream;
 
-    static Intent mResultIntent;
-    static int mResultCode;
-    private UpdateMgr update;
+   public static Intent mResultIntent;
+   public static int mResultCode;
+//    private UpdateMgr update;
 
     private BackgroundCameraService mService;
     private ServiceConnection conn;
@@ -99,12 +107,12 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     private static final int MSG_STATE = 1;
 
     private long mExitTime;//声明一个long类型变量：用于存放上一点击“返回键”的时刻
-
+    private TextView mScreenResTv;
     // 录像时的线程
     private Runnable mRecordTickRunnable = new Runnable() {
         @Override
         public void run() {
-            long duration = System.currentTimeMillis() - EasyApplication.getEasyApplication().mRecordingBegin;
+            long duration = System.currentTimeMillis() - MyApp.getEasyApplication().mRecordingBegin;
             duration /= 1000;
 
             textRecordTick.setText(String.format("%02d:%02d", duration / 60, (duration) % 60));
@@ -139,6 +147,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
 
         BUS.register(this);
 
@@ -154,7 +163,12 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             // resume
         }
     }
-
+    private void initView() {
+        mScreenResTv = findViewById(R.id.txt_res);
+        mScreenResTv.setOnClickListener(this);
+        String title = resDisplay[Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2)].toString();
+        mScreenResTv.setText(String.format("分辨率:%s", title));
+    }
     @Override
     protected void onPause() {
         if (!mNeedGrantedPermission) {
@@ -205,7 +219,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    update.doDownload();
+//                    update.doDownload();
                 }
 
                 break;
@@ -289,8 +303,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
         String url = "http://www.easydarwin.org/versions/easypusher/version.txt";
 
-        update = new UpdateMgr(this);
-        update.checkUpdate(url);
+//        update = new UpdateMgr(this);
+//        update.checkUpdate(url);
 
         // create background service for background use.
         Intent intent = new Intent(this, BackgroundCameraService.class);
@@ -314,7 +328,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
         bindService(new Intent(this, BackgroundCameraService.class), conn, 0);
 
-        if (EasyApplication.getEasyApplication().mRecording) {
+        if (MyApp.getEasyApplication().mRecording) {
             textRecordTick.setVisibility(View.VISIBLE);
             textRecordTick.removeCallbacks(mRecordTickRunnable);
             textRecordTick.post(mRecordTickRunnable);
@@ -330,9 +344,9 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     private void notifyAboutColorChange() {
         ImageView iv = findViewById(R.id.toolbar_about);
 
-        if (EasyApplication.activeDays >= 9999) {
+        if (MyApp.activeDays >= 9999) {
             iv.setImageResource(R.drawable.green);
-        } else if (EasyApplication.activeDays > 0) {
+        } else if (MyApp.activeDays > 0) {
             iv.setImageResource(R.drawable.yellow);
         } else {
             iv.setImageResource(R.drawable.red);
@@ -610,9 +624,62 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_switchCamera:
                 mMediaStream.switchCamera();
                 break;
+            case R.id.txt_res:
+                setCameraRes(resDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2));
+                break;
         }
     }
+    /**
+     * 配置相机的分辨率
+     */
+    private void setCameraRes(CharSequence[] res_display, int index) {
+        new AlertDialog.Builder(this).setTitle("设置分辨率").setSingleChoiceItems(res_display, index,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int position) {
+                        String title = res_display[position].toString();
+                        if (isStreaming()) {
+                            Toast.makeText(StreamActivity.this,  "取证中,无法切换分辨率", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            return;
+                        }
+                        String[] titles = title.split("x");
+                        if (res_display.length > 3) {
+                            //原生相机配置分辨率
+                            if (!Util.getSupportResolution(StreamActivity.this).contains(title)) {
+                                Toast.makeText(StreamActivity.this, "您的相机不支持此分辨率", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                                return;
+                            }
+                            Hawk.put(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, position);
+                            Hawk.put(HawkProperty.KEY_NATIVE_WIDTH, Integer.parseInt(titles[0]));
+                            Hawk.put(HawkProperty.KEY_NATIVE_HEIGHT, Integer.parseInt(titles[1]));
+                            if (mMediaStream != null) {
+                                mMediaStream.updateResolution(width, height);
+                            }
+                        } else {
+                            Hawk.put(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, position);
+                            Hawk.put(HawkProperty.KEY_UVC_WIDTH, Integer.parseInt(titles[0]));
+                            Hawk.put(HawkProperty.KEY_UVC_HEIGHT, Integer.parseInt(titles[1]));
+                            if (mMediaStream != null) {
+                                mMediaStream.updateResolution(width, height);
+                            }
+                        }
+                        mScreenResTv.setText("分辨率:" + title);
 
+
+                        dialog.dismiss();
+                    }
+
+
+                }).show();
+    }
+    /**
+     * 是否正在推流
+     */
+    private boolean isStreaming() {
+        return mMediaStream != null && (mMediaStream.isStreaming() );
+    }
     /*
      * 录像
      * */

@@ -1,4 +1,4 @@
-package org.easydarwin.easypusher;
+package org.easydarwin.homepage;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -16,6 +16,8 @@ import android.view.Gravity;
 import android.view.TextureView;
 import android.view.WindowManager;
 
+import org.easydarwin.MyApp;
+import org.easydarwin.easypusher.R;
 import org.easydarwin.push.MediaStream;
 
 public class BackgroundCameraService extends Service implements TextureView.SurfaceTextureListener {
@@ -95,13 +97,10 @@ public class BackgroundCameraService extends Service implements TextureView.Surf
     private void backGroundNotificate() {
         Intent notificationIntent = new Intent(this, StreamActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this, EasyApplication.CHANNEL_CAMERA)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.video_uploading_in_background))
-                        .setSmallIcon(R.drawable.ic_stat_camera)
-                        .setContentIntent(pendingIntent)
-                        .build();
-
+        Notification notification = new NotificationCompat.Builder(this, MyApp.CHANNEL_CAMERA)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentIntent(pendingIntent)
+                .build();
         startForeground(NOTIFICATION_ID, notification);
     }
 

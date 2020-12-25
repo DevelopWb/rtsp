@@ -11,7 +11,7 @@ import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.easydarwin.easypusher.EasyApplication;
+import org.easydarwin.MyApp;
 import org.easydarwin.muxer.EasyMuxer;
 import org.easydarwin.push.Pusher;
 
@@ -196,7 +196,7 @@ public class AudioStream {
     }
 
     public static synchronized AudioStream getInstance() {
-        EasyApplication app = EasyApplication.getEasyApplication();
+        MyApp app = MyApp.getEasyApplication();
         if (_this == null) _this = new AudioStream(app);
         return _this;
     }

@@ -20,9 +20,9 @@ import android.util.Log;
 
 import org.easydarwin.audio.AudioStream;
 import org.easydarwin.bus.SupportResolution;
-import org.easydarwin.easypusher.BackgroundCameraService;
+import org.easydarwin.homepage.BackgroundCameraService;
 import org.easydarwin.easypusher.BuildConfig;
-import org.easydarwin.easypusher.EasyApplication;
+import org.easydarwin.MyApp;
 import org.easydarwin.muxer.EasyMuxer;
 import org.easydarwin.sw.JNIUtil;
 import org.easydarwin.util.SPUtil;
@@ -45,7 +45,7 @@ import static android.media.MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420P
 import static android.media.MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar;
 import static android.media.MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar;
 import static android.media.MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar;
-import static org.easydarwin.easypusher.EasyApplication.BUS;
+import static org.easydarwin.MyApp.BUS;
 
 public class MediaStream {
     private static final boolean VERBOSE = BuildConfig.DEBUG;
@@ -144,7 +144,7 @@ public class MediaStream {
     }
 
     public void startStream(String url, InitCallback callback) {
-        if (SPUtil.getEnableVideo(EasyApplication.getEasyApplication()))
+        if (SPUtil.getEnableVideo(MyApp.getEasyApplication()))
             mEasyPusher.initPush(url, mApplicationContext, callback);
         else
             mEasyPusher.initPush(url, mApplicationContext, callback, ~0);

@@ -58,7 +58,7 @@ public class SPUtil {
 
     public static boolean getEnableBackgroundCamera(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(KEY_ENABLE_BACKGROUND_CAMERA, false);
+                .getBoolean(KEY_ENABLE_BACKGROUND_CAMERA, true);
     }
 
     public static void setEnableBackgroundCamera(Context context, boolean value) {
@@ -115,20 +115,20 @@ public class SPUtil {
                 .apply();
     }
 
-//    /* ============================ 使能H.265编码 ============================ */
-//    private static final String KEY_HEVC_CODEC = "key-hevc-codec";
-//
-//    public static boolean getHevcCodec(Context context) {
-//        return PreferenceManager.getDefaultSharedPreferences(context)
-//                .getBoolean(KEY_HEVC_CODEC, false);
-//    }
-//
-//    public static void setHevcCodec(Context context, boolean isChecked) {
-//        PreferenceManager.getDefaultSharedPreferences(context)
-//                .edit()
-//                .putBoolean(KEY_HEVC_CODEC, isChecked)
-//                .apply();
-//    }
+    //    /* ============================ 使能H.265编码 ============================ */
+    //    private static final String KEY_HEVC_CODEC = "key-hevc-codec";
+    //
+    //    public static boolean getHevcCodec(Context context) {
+    //        return PreferenceManager.getDefaultSharedPreferences(context)
+    //                .getBoolean(KEY_HEVC_CODEC, false);
+    //    }
+    //
+    //    public static void setHevcCodec(Context context, boolean isChecked) {
+    //        PreferenceManager.getDefaultSharedPreferences(context)
+    //                .edit()
+    //                .putBoolean(KEY_HEVC_CODEC, isChecked)
+    //                .apply();
+    //    }
 
     /* ============================ 码率 ============================ */
     private static final String KEY_BITRATE_ADDED_KBPS = "bitrate_added_kbps";
@@ -139,9 +139,46 @@ public class SPUtil {
     }
 
     public static void setBitrateKbps(Context context, int value) {
-         PreferenceManager.getDefaultSharedPreferences(context)
-                 .edit()
-                 .putInt(KEY_BITRATE_ADDED_KBPS, value)
-                 .apply();
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putInt(KEY_BITRATE_ADDED_KBPS, value)
+                .apply();
+    }
+
+
+
+
+    /**
+     * 保存IP
+     */
+    private static final String KEY_SCREEN_PUSHING_IP = "screen_pushing_res_ip";
+
+    public static String getScreenPushingIP(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(KEY_SCREEN_PUSHING_IP,"218.246.35.199");
+    }
+
+    public static void setScreenPushingIP(Context context, String value) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(KEY_SCREEN_PUSHING_IP, value)
+                .apply();
+    }
+
+    /**
+     * 保存端口号
+     */
+    private static final String KEY_SCREEN_PUSHING_PORT = "screen_pushing_port";
+
+    public static String getScreenPushingPort(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(KEY_SCREEN_PUSHING_PORT, "554");
+    }
+
+    public static void setScreenPushingPort(Context context, String value) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(KEY_SCREEN_PUSHING_PORT, value)
+                .apply();
     }
 }

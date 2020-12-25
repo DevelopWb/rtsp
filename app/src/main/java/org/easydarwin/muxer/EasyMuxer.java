@@ -8,7 +8,7 @@ import android.util.Log;
 import org.easydarwin.bus.StartRecord;
 import org.easydarwin.bus.StopRecord;
 import org.easydarwin.easypusher.BuildConfig;
-import org.easydarwin.easypusher.EasyApplication;
+import org.easydarwin.MyApp;
 import org.easydarwin.video.EasyMuxer2;
 
 import java.nio.ByteBuffer;
@@ -44,13 +44,13 @@ public class EasyMuxer {
             mVideoFormat = format;
             if (mAudioFormat != null) {
                 startMuxer();
-                EasyApplication.BUS.post(new StartRecord());
+                MyApp.BUS.post(new StartRecord());
             }
         } else {
             mAudioFormat = format;
             if (mVideoFormat != null) {
                 startMuxer();
-                EasyApplication.BUS.post(new StartRecord());
+                MyApp.BUS.post(new StartRecord());
             }
         }
     }
@@ -137,7 +137,7 @@ public class EasyMuxer {
         if (mMuxer != null) {
             mMuxer.close();
             mMuxer = null;
-            EasyApplication.BUS.post(new StopRecord());
+            MyApp.BUS.post(new StopRecord());
         }
     }
 }

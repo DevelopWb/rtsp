@@ -11,7 +11,7 @@ import android.util.Log;
 
 import org.easydarwin.bus.StreamStat;
 
-import static org.easydarwin.easypusher.EasyApplication.BUS;
+import static org.easydarwin.MyApp.BUS;
 
 public class EasyPusher implements Pusher {
     private static String TAG = "EasyPusher";

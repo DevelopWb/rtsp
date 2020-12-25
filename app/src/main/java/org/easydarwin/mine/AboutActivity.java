@@ -1,4 +1,4 @@
-package org.easydarwin.easypusher;
+package org.easydarwin.mine;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.URLSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.easydarwin.MyApp;
+import org.easydarwin.easypusher.R;
 import org.easydarwin.easypusher.databinding.ActivityAboutBinding;
 
 /**
@@ -34,20 +34,20 @@ public class AboutActivity extends AppCompatActivity implements Toolbar.OnMenuIt
         binding.version.append("(");
 
         SpannableString spannableString;
-        if (EasyApplication.activeDays >= 9999) {
+        if (MyApp.activeDays >= 9999) {
             spannableString = new SpannableString("激活码永久有效");
             spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorGREEN)),
                     0,
                     spannableString.length(),
                     Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        } else if (EasyApplication.activeDays > 0) {
-            spannableString = new SpannableString(String.format("激活码还剩%d天可用", EasyApplication.activeDays));
+        } else if (MyApp.activeDays > 0) {
+            spannableString = new SpannableString(String.format("激活码还剩%d天可用", MyApp.activeDays));
             spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorYELLOW)),
                     0,
                     spannableString.length(),
                     Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         } else {
-            spannableString = new SpannableString(String.format("激活码已过期(%d)", EasyApplication.activeDays));
+            spannableString = new SpannableString(String.format("激活码已过期(%d)", MyApp.activeDays));
             spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorRED)),
                     0,
                     spannableString.length(),

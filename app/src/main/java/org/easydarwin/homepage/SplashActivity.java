@@ -4,7 +4,7 @@
 	WEChat: EasyDarwin
 	Website: http://www.easydarwin.org
 */
-package org.easydarwin.easypusher;
+package org.easydarwin.homepage;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import org.easydarwin.easypusher.R;
 
 /**
  * 启动页

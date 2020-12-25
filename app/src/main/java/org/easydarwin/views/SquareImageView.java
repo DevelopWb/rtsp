@@ -1,4 +1,4 @@
-package org.easydarwin.easypusher.views;
+package org.easydarwin.views;
 
 import android.content.Context;
 import android.os.Build;

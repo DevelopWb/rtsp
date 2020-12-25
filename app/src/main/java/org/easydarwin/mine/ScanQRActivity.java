@@ -1,4 +1,4 @@
-package org.easydarwin.easypusher;
+package org.easydarwin.mine;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.budiyev.android.codescanner.ScanMode;
 import com.google.zxing.Result;
+
+import org.easydarwin.easypusher.R;
 
 public class ScanQRActivity extends AppCompatActivity {
 
