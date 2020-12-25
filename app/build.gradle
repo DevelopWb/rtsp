@@ -14,13 +14,24 @@ android {
         flavorDimensions "versionCode"
     }
 
+    signingConfigs {
+        config {
+            keyAlias 'dwh'
+            keyPassword 'dwh2016'
+            storeFile file('push.jks')
+            storePassword 'dwh2016'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
-
     dataBinding {
         enabled = true
     }
