@@ -18,6 +18,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.orhanobut.hawk.Hawk;
+
 import org.easydarwin.audio.AudioStream;
 import org.easydarwin.bus.SupportResolution;
 import org.easydarwin.homepage.BackgroundCameraService;
@@ -25,6 +27,7 @@ import org.easydarwin.easypusher.BuildConfig;
 import org.easydarwin.MyApp;
 import org.easydarwin.muxer.EasyMuxer;
 import org.easydarwin.sw.JNIUtil;
+import org.easydarwin.util.HawkProperty;
 import org.easydarwin.util.SPUtil;
 import org.easydarwin.util.Util;
 
@@ -165,17 +168,12 @@ public class MediaStream {
     /**
      * 更新分辨率
      */
-    public void updateResolution(final int w, final int h) {
-        if (mCamera == null) return;
+    public void updateResolution() {
+        if (mCamera == null) {
+            return;
+        }
         stopPreview();
         destroyCamera();
-        mCameraHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                width = w;
-                height = h;
-            }
-        });
         createCamera();
         startPreview();
     }
@@ -239,7 +237,8 @@ public class MediaStream {
             } else {
                 mSWCodec = true;
             }
-//            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+            width = Hawk.get(HawkProperty.KEY_NATIVE_WIDTH, width);
+            height = Hawk.get(HawkProperty.KEY_NATIVE_HEIGHT, height);
             parameters.setPreviewSize(width, height);
 //            parameters.setPreviewFpsRange(max[0], max[1]);
             parameters.setPreviewFrameRate(20);
@@ -248,22 +247,6 @@ public class MediaStream {
             if (supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             }
-//            int maxExposureCompensation = parameters.getMaxExposureCompensation();
-//            parameters.setExposureCompensation(3);
-//
-//            if(parameters.isAutoExposureLockSupported()) {
-//                parameters.setAutoExposureLock(false);
-//            }
-
-//            parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
-//            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
-//            parameters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
-//            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
-//            mCamera.setFaceDetectionListener(new );
-
-//            if (parameters.isAutoWhiteBalanceLockSupported()){
-//                parameters.setAutoExposureLock(false);
-//            }
 
             mCamera.setParameters(parameters);
             Log.i(TAG, "setParameters");
@@ -380,9 +363,6 @@ public class MediaStream {
             int previewFormat = mCamera.getParameters().getPreviewFormat();
             Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
             int size = previewSize.width * previewSize.height * ImageFormat.getBitsPerPixel(previewFormat) / 8;
-            width = previewSize.width;
-            height = previewSize.height;
-            mCamera.addCallbackBuffer(new byte[size]);
             mCamera.addCallbackBuffer(new byte[size]);
             mCamera.setPreviewCallbackWithBuffer(previewCallback);
             Log.i(TAG, "setPreviewCallbackWithBuffer");
@@ -406,19 +386,7 @@ public class MediaStream {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
             mCamera.startPreview();
-
-//            boolean frameRotate = false;
-//            int cameraRotationOffset = camInfo.orientation;
-//            if (mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT)
-//                cameraRotationOffset += 180;
-//            if (cameraRotationOffset % 180 != 0) {
-//                frameRotate = true;
-//            }
-//            frameWidth = frameRotate ? height:width;
-//            frameHeight = frameRotate ? width:height;
 
             boolean frameRotate;
             int result;

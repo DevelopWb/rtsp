@@ -19,24 +19,11 @@ import com.orhanobut.hawk.Hawk;
  */
 public class Config {
 
-    private static final String SERVER_URL = "serverUrl";
-    //    private static final String DEFAULT_SERVER_URL = "rtsp://cloud.easydarwin.org:554/" + String.valueOf((int) (Math.random() * 1000000 + 100000));
-    private static final String DEFAULT_SERVER_URL = "rtsp://58.49.46.179:554/X6fIDGY9";
 
     public static String getServerURL(Context context) {
         return String.format("rtsp://%s:%s/%s",getIp(context),getPort(context),(String) Hawk.get(HawkProperty.REG_CODE,"X6fIDGY9"));
     }
 
-    public static void setServerURL(Context context, String value) {
-        if (value == null || TextUtils.isEmpty(value)) {
-            value = DEFAULT_SERVER_URL;
-        }
-
-        PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putString(SERVER_URL, value)
-                .apply();
-    }
 
     public static String getIp(Context context) {
         return SPUtil.getScreenPushingIP(context);

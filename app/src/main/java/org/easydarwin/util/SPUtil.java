@@ -155,7 +155,7 @@ public class SPUtil {
 
     public static String getScreenPushingIP(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(KEY_SCREEN_PUSHING_IP,"218.246.35.199");
+                .getString(KEY_SCREEN_PUSHING_IP,HawkProperty.DEFAULT_IP);
     }
 
     public static void setScreenPushingIP(Context context, String value) {
@@ -172,7 +172,7 @@ public class SPUtil {
 
     public static String getScreenPushingPort(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(KEY_SCREEN_PUSHING_PORT, "554");
+                .getString(KEY_SCREEN_PUSHING_PORT, HawkProperty.DEFAULT_PORT);
     }
 
     public static void setScreenPushingPort(Context context, String value) {

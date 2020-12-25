@@ -86,7 +86,6 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
     TextView txtStreamAddress;
     ImageView btnSwitchCemera;
-    Spinner spnResolution;
     TextView txtStatus, streamStat;
     TextView textRecordTick;
 
@@ -276,7 +275,6 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void goonWithPermissionGranted() {
-        spnResolution = findViewById(R.id.spn_resolution);
         streamStat = findViewById(R.id.stream_stat);
         txtStatus = findViewById(R.id.txt_stream_status);
         btnSwitchCemera = findViewById(R.id.btn_switchCamera);
@@ -390,7 +388,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void startCamera() {
-        mMediaStream.updateResolution(width, height);
+        mMediaStream.updateResolution();
         mMediaStream.setDgree(getDisplayRotationDegree());
         mMediaStream.createCamera();
         mMediaStream.startPreview();
@@ -424,54 +422,6 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
         return degrees;
     }
 
-    /*
-     * 初始化下拉控件的列表（显示分辨率）
-     * */
-    private void initSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spn_item, listResolution);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnResolution.setAdapter(adapter);
-
-        int position = listResolution.indexOf(String.format("%dx%d", width, height));
-        spnResolution.setSelection(position, false);
-
-        spnResolution.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mMediaStream != null && mMediaStream.isStreaming()) {
-                    int pos = listResolution.indexOf(String.format("%dx%d", width, height));
-
-                    if (pos == position)
-                        return;
-
-                    spnResolution.setSelection(pos, false);
-
-                    Toast.makeText(StreamActivity.this, "正在推送中,无法切换分辨率", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String r = listResolution.get(position);
-                String[] splitR = r.split("x");
-
-                int wh = Integer.parseInt(splitR[0]);
-                int ht = Integer.parseInt(splitR[1]);
-
-                if (width != wh || height != ht) {
-                    width = wh;
-                    height = ht;
-
-                    if (mMediaStream != null) {
-                        mMediaStream.updateResolution(width, height);
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
 
     /*
      * 开始录像的通知
@@ -537,7 +487,6 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
                 height = Integer.parseInt(splitR[1]);
             }
 
-            initSpinner();
         });
     }
 
@@ -655,19 +604,17 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
                             Hawk.put(HawkProperty.KEY_NATIVE_WIDTH, Integer.parseInt(titles[0]));
                             Hawk.put(HawkProperty.KEY_NATIVE_HEIGHT, Integer.parseInt(titles[1]));
                             if (mMediaStream != null) {
-                                mMediaStream.updateResolution(width, height);
+                                mMediaStream.updateResolution();
                             }
                         } else {
                             Hawk.put(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, position);
                             Hawk.put(HawkProperty.KEY_UVC_WIDTH, Integer.parseInt(titles[0]));
                             Hawk.put(HawkProperty.KEY_UVC_HEIGHT, Integer.parseInt(titles[1]));
                             if (mMediaStream != null) {
-                                mMediaStream.updateResolution(width, height);
+                                mMediaStream.updateResolution();
                             }
                         }
                         mScreenResTv.setText("分辨率:" + title);
-
-
                         dialog.dismiss();
                     }
 
@@ -753,12 +700,6 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    /*
-     * 切换分辨率
-     * */
-    public void onClickResolution(View view) {
-        findViewById(R.id.spn_resolution).performClick();
-    }
 
     /*
      * 切换屏幕方向
