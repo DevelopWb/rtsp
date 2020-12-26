@@ -72,8 +72,9 @@ import static org.easydarwin.update.UpdateMgr.MY_PERMISSIONS_REQUEST_WRITE_EXTER
 
 /**
  * 预览+推流等主页
- * */
-public class StreamActivity extends AppCompatActivity implements View.OnClickListener, TextureView.SurfaceTextureListener {
+ */
+public class StreamActivity extends AppCompatActivity implements View.OnClickListener,
+        TextureView.SurfaceTextureListener {
     static final String TAG = "StreamActivity";
 
     public static final int REQUEST_MEDIA_PROJECTION = 1002;
@@ -93,9 +94,9 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
     MediaStream mMediaStream;
 
-   public static Intent mResultIntent;
-   public static int mResultCode;
-//    private UpdateMgr update;
+    public static Intent mResultIntent;
+    public static int mResultCode;
+    //    private UpdateMgr update;
 
     private BackgroundCameraService mService;
     private ServiceConnection conn;
@@ -119,7 +120,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             if (duration % 2 == 0) {
                 textRecordTick.setCompoundDrawablesWithIntrinsicBounds(R.drawable.recording_marker_shape, 0, 0, 0);
             } else {
-                textRecordTick.setCompoundDrawablesWithIntrinsicBounds(R.drawable.recording_marker_interval_shape, 0, 0, 0);
+                textRecordTick.setCompoundDrawablesWithIntrinsicBounds(R.drawable.recording_marker_interval_shape, 0,
+                        0, 0);
             }
 
             textRecordTick.removeCallbacks(this);
@@ -138,6 +140,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     };
+    private ImageView mSwitchOrientationIv;
+    private ImageView mPushStreamIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,27 +151,32 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         BUS.register(this);
-
         notifyAboutColorChange();
 
         // 动态获取camera和audio权限
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, REQUEST_CAMERA_PERMISSION);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
+                    Manifest.permission.RECORD_AUDIO}, REQUEST_CAMERA_PERMISSION);
             mNeedGrantedPermission = true;
             return;
         } else {
             // resume
         }
     }
+
     private void initView() {
         mScreenResTv = findViewById(R.id.txt_res);
+        mSwitchOrientationIv = findViewById(R.id.btn_switch_orientation);
+        mPushStreamIv = findViewById(R.id.streaming_activity_push);
+        mSwitchOrientationIv.setOnClickListener(this);
         mScreenResTv.setOnClickListener(this);
         String title = resDisplay[Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2)].toString();
         mScreenResTv.setText(String.format("分辨率:%s", title));
     }
+
     @Override
     protected void onPause() {
         if (!mNeedGrantedPermission) {
@@ -218,7 +227,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    update.doDownload();
+                    //                    update.doDownload();
                 }
 
                 break;
@@ -268,7 +277,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             viewById.setText(Config.getServerURL(this));
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                MediaProjectionManager mMpMngr = (MediaProjectionManager) getApplicationContext().getSystemService(MEDIA_PROJECTION_SERVICE);
+                MediaProjectionManager mMpMngr =
+                        (MediaProjectionManager) getApplicationContext().getSystemService(MEDIA_PROJECTION_SERVICE);
                 startActivityForResult(mMpMngr.createScreenCaptureIntent(), StreamActivity.REQUEST_MEDIA_PROJECTION);
             }
         }
@@ -301,8 +311,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
         String url = "http://www.easydarwin.org/versions/easypusher/version.txt";
 
-//        update = new UpdateMgr(this);
-//        update.checkUpdate(url);
+        //        update = new UpdateMgr(this);
+        //        update.checkUpdate(url);
 
         // create background service for background use.
         Intent intent = new Intent(this, BackgroundCameraService.class);
@@ -385,6 +395,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             startCamera();
             mService.setMediaStream(ms);
         }
+        onStartOrStopPush();
     }
 
     private void startCamera() {
@@ -511,25 +522,25 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
      */
     @Override
     public void onBackPressed() {
-//        boolean isStreaming = mMediaStream != null && mMediaStream.isStreaming();
-//
-//        if (isStreaming && SPUtil.getEnableBackgroundCamera(this)) {
-//            new AlertDialog.Builder(this).setTitle("是否允许后台上传？")
-//                    .setMessage("您设置了使能摄像头后台采集,是否继续在后台采集并上传视频？如果是，记得直播结束后,再回来这里关闭直播。")
-//                    .setNeutralButton("后台采集", (dialogInterface, i) -> {
-//                        StreamActivity.super.onBackPressed();
-//                    })
-//                    .setPositiveButton("退出程序", (dialogInterface, i) -> {
-//                        mMediaStream.stopStream();
-//                        StreamActivity.super.onBackPressed();
-//                        Toast.makeText(StreamActivity.this, "程序已退出。", Toast.LENGTH_SHORT).show();
-//                    })
-//                    .setNegativeButton(android.R.string.cancel, null)
-//                    .show();
-//            return;
-//        } else {
-//            super.onBackPressed();
-//        }
+        //        boolean isStreaming = mMediaStream != null && mMediaStream.isStreaming();
+        //
+        //        if (isStreaming && SPUtil.getEnableBackgroundCamera(this)) {
+        //            new AlertDialog.Builder(this).setTitle("是否允许后台上传？")
+        //                    .setMessage("您设置了使能摄像头后台采集,是否继续在后台采集并上传视频？如果是，记得直播结束后,再回来这里关闭直播。")
+        //                    .setNeutralButton("后台采集", (dialogInterface, i) -> {
+        //                        StreamActivity.super.onBackPressed();
+        //                    })
+        //                    .setPositiveButton("退出程序", (dialogInterface, i) -> {
+        //                        mMediaStream.stopStream();
+        //                        StreamActivity.super.onBackPressed();
+        //                        Toast.makeText(StreamActivity.this, "程序已退出。", Toast.LENGTH_SHORT).show();
+        //                    })
+        //                    .setNegativeButton(android.R.string.cancel, null)
+        //                    .show();
+        //            return;
+        //        } else {
+        //            super.onBackPressed();
+        //        }
 
         boolean isStreaming = mMediaStream != null && mMediaStream.isStreaming();
 
@@ -576,8 +587,12 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.txt_res:
                 setCameraRes(resDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2));
                 break;
+            case R.id.btn_switch_orientation:
+                onStartOrStopPush();
+                break;
         }
     }
+
     /**
      * 配置相机的分辨率
      */
@@ -588,7 +603,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
                     public void onClick(DialogInterface dialog, int position) {
                         String title = res_display[position].toString();
                         if (isStreaming()) {
-                            Toast.makeText(StreamActivity.this,  "取证中,无法切换分辨率", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StreamActivity.this, "取证中,无法切换分辨率", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                             return;
                         }
@@ -621,18 +636,21 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
                 }).show();
     }
+
     /**
      * 是否正在推流
      */
     private boolean isStreaming() {
-        return mMediaStream != null && (mMediaStream.isStreaming() );
+        return mMediaStream != null && (mMediaStream.isStreaming());
     }
+
     /*
      * 录像
      * */
     public void onRecord(View view) {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_STORAGE_PERMISSION);
             return;
         }
 
@@ -665,10 +683,11 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
                         .setPositiveButton(android.R.string.ok,
                                 (dialogInterface, i) -> {
                                     // 在Android 6.0后，Android需要动态获取权限，若没有权限，提示获取.
-                                    final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                                    final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                            Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                                     startActivityForResult(intent, REQUEST_OVERLAY_PERMISSION);
                                 })
-                        .setNegativeButton(android.R.string.cancel,null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .setCancelable(false)
                         .show();
                 return;
@@ -706,33 +725,28 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
      * */
     public void onSwitchOrientation(View view) {
         if (mMediaStream != null) {
-            if (mMediaStream.isStreaming()){
-                Toast.makeText(this,"正在推送中,无法更改屏幕方向", Toast.LENGTH_SHORT).show();
+            if (mMediaStream.isStreaming()) {
+                Toast.makeText(this, "正在推送中,无法更改屏幕方向", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
         int orientation = getRequestedOrientation();
 
-        if (orientation == SCREEN_ORIENTATION_UNSPECIFIED || orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+        if (orientation == SCREEN_ORIENTATION_UNSPECIFIED || orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
-//        if (mMediaStream != null)
-//            mMediaStream.setDisplayRotationDegree(getDisplayRotationDegree());
     }
 
     /*
      * 推流or停止
      * */
-    public void onStartOrStopPush(View view) {
-        ImageView ib = findViewById(R.id.streaming_activity_push);
-
+    public void onStartOrStopPush() {
         if (!mMediaStream.isStreaming()) {
             String url = Config.getServerURL(this);
-
             String ip = Config.getIp(this);
             String port = Config.getPort(this);
             String id = Config.getId(this);
@@ -777,11 +791,11 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
                 }
             });
 
-            ib.setImageResource(R.drawable.start_push_pressed);
+            mPushStreamIv.setImageResource(R.drawable.start_push_pressed);
             txtStreamAddress.setText(url);
         } else {
             mMediaStream.stopStream();
-            ib.setImageResource(R.drawable.start_push);
+            mPushStreamIv.setImageResource(R.drawable.start_push);
             sendMessage("断开连接");
         }
     }
@@ -792,7 +806,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     public void onAbout(View view) {
         Intent intent = new Intent(this, AboutActivity.class);
         startActivityForResult(intent, 0);
-        overridePendingTransition(R.anim.slide_right_in,R.anim.slide_left_out);
+        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_left_out);
     }
 
     /*
@@ -801,7 +815,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     public void onSetting(View view) {
         Intent intent = new Intent(this, SettingActivity.class);
         startActivityForResult(intent, 0);
-        overridePendingTransition(R.anim.slide_right_in,R.anim.slide_left_out);
+        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_left_out);
     }
 
     /* ========================= TextureView.SurfaceTextureListener ========================= */
