@@ -237,11 +237,11 @@ Video bitrate 384 Kbps 2 Mbps 4 Mbps 10 Mbps
         int bitrate = (int) (mWidth * mHeight * 20 * 4 * 0.05f);
 
         if (mWidth >= 1920 || mHeight >= 1920)
-            bitrate *= 0.3;
+            bitrate *= 0.6;
         else if (mWidth >= 1280 || mHeight >= 1280)
             bitrate *= 0.4;
         else if (mWidth >= 720 || mHeight >= 720)
-            bitrate *= 0.6;
+            bitrate *= 0.3;
 
         try {
             mMediaCodec = MediaCodec.createByCodecName(info.mName);
@@ -251,7 +251,7 @@ Video bitrate 384 Kbps 2 Mbps 4 Mbps 10 Mbps
         }
 
         MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", mWidth, mHeight);
-        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate + 3000);
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate + 2000000);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, framerate);
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, info.mColorFormat);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);

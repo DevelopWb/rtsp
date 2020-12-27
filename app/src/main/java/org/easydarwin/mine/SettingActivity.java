@@ -60,10 +60,11 @@ public class SettingActivity extends AppCompatActivity implements Toolbar.OnMenu
         // 左边的小箭头（注意需要在setSupportActionBar(toolbar)之后才有效果）
         binding.mainToolbar.setNavigationIcon(R.drawable.com_back);
 
-        binding.registCodeValue.setText((String) Hawk.get(HawkProperty.REG_CODE,"X6fIDGY9"));
+        binding.registCodeValue.setText((String) Hawk.get(HawkProperty.REG_CODE));
         binding.pushServerIpEt.setText(SPUtil.getScreenPushingIP(this));
         binding.pushServerPortEt.setText(SPUtil.getScreenPushingPort(this));
         binding.quitAppBt.setOnClickListener(this);
+        binding.autoPushWhenRunCb.setChecked(Hawk.get(HawkProperty.AUTO_RUN,true));
         // 使能摄像头后台采集
         CheckBox backgroundPushing = (CheckBox) findViewById(R.id.enable_background_camera_pushing);
         backgroundPushing.setChecked(SPUtil.getEnableBackgroundCamera(this));

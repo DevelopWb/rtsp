@@ -58,7 +58,7 @@ public class MediaStream {
     static final String TAG = "MediaStream";
     int width = 1280, height = 720;
     int framerate, bitrate;
-    int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    int mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
     MediaCodec mMediaCodec;
     WeakReference<SurfaceTexture> mSurfaceHolderRef;
     Camera mCamera;

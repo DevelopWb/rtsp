@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -34,13 +35,18 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.juntai.wisdom.basecomponent.utils.ToastUtils;
 import com.orhanobut.hawk.Hawk;
+import com.regmode.RegLatestContact;
+import com.regmode.Utils.RegOperateManager;
 import com.squareup.otto.Subscribe;
 
+import org.easydarwin.BaseProjectActivity;
 import org.easydarwin.bus.StartRecord;
 import org.easydarwin.bus.StopRecord;
 import org.easydarwin.bus.StreamStat;
@@ -73,7 +79,7 @@ import static org.easydarwin.update.UpdateMgr.MY_PERMISSIONS_REQUEST_WRITE_EXTER
 /**
  * 预览+推流等主页
  */
-public class StreamActivity extends AppCompatActivity implements View.OnClickListener,
+public class StreamActivity extends BaseProjectActivity implements View.OnClickListener,
         TextureView.SurfaceTextureListener {
     static final String TAG = "StreamActivity";
 
@@ -140,8 +146,8 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     };
-    private ImageView mSwitchOrientationIv;
     private ImageView mPushStreamIv;
+    private LinearLayout mPushStreamLl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,9 +155,22 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
+        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+            @Override
+            public void toFinishActivity() {
+                finish();
+            }
+
+            @Override
+            public void toDoNext() {
+                if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
+                    onStartOrStopPush();
+                }
+
+            }
+        });
         setContentView(R.layout.activity_main);
         initView();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         BUS.register(this);
         notifyAboutColorChange();
 
@@ -169,10 +188,10 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
 
     private void initView() {
         mScreenResTv = findViewById(R.id.txt_res);
-        mSwitchOrientationIv = findViewById(R.id.btn_switch_orientation);
         mPushStreamIv = findViewById(R.id.streaming_activity_push);
-        mSwitchOrientationIv.setOnClickListener(this);
+        mPushStreamLl = findViewById(R.id.push_stream_ll);
         mScreenResTv.setOnClickListener(this);
+        mPushStreamLl.setOnClickListener(this);
         String title = resDisplay[Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2)].toString();
         mScreenResTv.setText(String.format("分辨率:%s", title));
     }
@@ -395,7 +414,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             startCamera();
             mService.setMediaStream(ms);
         }
-        onStartOrStopPush();
+
     }
 
     private void startCamera() {
@@ -587,7 +606,7 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.txt_res:
                 setCameraRes(resDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2));
                 break;
-            case R.id.btn_switch_orientation:
+            case R.id.push_stream_ll:
                 onStartOrStopPush();
                 break;
         }
@@ -745,6 +764,9 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
      * 推流or停止
      * */
     public void onStartOrStopPush() {
+        if (mMediaStream == null) {
+            return;
+        }
         if (!mMediaStream.isStreaming()) {
             String url = Config.getServerURL(this);
             String ip = Config.getIp(this);
@@ -813,6 +835,10 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
      * 设置
      * */
     public void onSetting(View view) {
+        if (mMediaStream != null && mMediaStream.isStreaming()) {
+            ToastUtils.toast(mContext,"推流中,无法进入设置界面");
+            return;
+        }
         Intent intent = new Intent(this, SettingActivity.class);
         startActivityForResult(intent, 0);
         overridePendingTransition(R.anim.slide_right_in, R.anim.slide_left_out);
@@ -841,4 +867,5 @@ public class StreamActivity extends AppCompatActivity implements View.OnClickLis
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
     }
+
 }

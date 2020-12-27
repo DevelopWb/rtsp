@@ -21,7 +21,7 @@ public class Config {
 
 
     public static String getServerURL(Context context) {
-        return String.format("rtsp://%s:%s/%s",getIp(context),getPort(context),(String) Hawk.get(HawkProperty.REG_CODE,"X6fIDGY9"));
+        return String.format("rtsp://%s:%s/%s",getIp(context),getPort(context),(String) Hawk.get(HawkProperty.REG_CODE));
     }
 
 
@@ -34,7 +34,7 @@ public class Config {
     }
 
     public static String getId(Context context) {
-        return (String) Hawk.get(HawkProperty.REG_CODE,"X6fIDGY9");
+        return (String) Hawk.get(HawkProperty.REG_CODE);
     }
 
     public static String recordPath() {

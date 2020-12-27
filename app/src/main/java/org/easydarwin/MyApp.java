@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 
+import com.basenetlib.util.NetWorkUtil;
 import com.orhanobut.hawk.Hawk;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -43,6 +44,7 @@ public class MyApp extends Application {
 
         mApplication = this;
         Hawk.init(this).build();
+        NetWorkUtil.initContext(this);
         if (!BuildConfig.DEBUG) {
             CrashReport.initCrashReport(getApplicationContext(), "678a09e90e", false);
         }
