@@ -33,18 +33,18 @@ public class SplashActivity extends BaseProjectActivity {
         setContentView(R.layout.splash_activity);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN); //隐藏状态栏
-        if (!NetWorkUtil.isNetworkAvailable()) {
-            new AlertDialog.Builder(mContext)
-                    .setCancelable(false)
-                    .setMessage("网络连接异常，请检查手机网络或系统时间！")
-                    .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityManagerTool.getInstance().finishApp();
-                        }
-                    }).show();
-            return;
-        }
+//        if (!NetWorkUtil.isNetworkAvailable()) {
+//            new AlertDialog.Builder(mContext)
+//                    .setCancelable(false)
+//                    .setMessage("网络连接异常，请检查手机网络或系统时间！")
+//                    .setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            ActivityManagerTool.getInstance().finishApp();
+//                        }
+//                    }).show();
+//            return;
+//        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
