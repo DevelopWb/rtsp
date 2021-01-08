@@ -143,6 +143,8 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                     String state = msg.getData().getString("state");
                     txtStatus.setText(state);
                     break;
+                default:
+                    break;
             }
         }
     };
@@ -241,7 +243,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
      * android6.0权限，onRequestPermissionsResult回调
      * */
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
                 // If request is cancelled, the result arrays are empty.
@@ -261,7 +263,10 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                 }
 
                 break;
+
             }
+            default:
+                break;
         }
     }
 
@@ -836,7 +841,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
      * */
     public void onSetting(View view) {
         if (mMediaStream != null && mMediaStream.isStreaming()) {
-            ToastUtils.toast(mContext,"推流中,无法进入设置界面");
+            ToastUtils.toast(mContext, "推流中,无法进入设置界面");
             return;
         }
         Intent intent = new Intent(this, SettingActivity.class);
