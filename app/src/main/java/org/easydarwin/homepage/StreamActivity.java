@@ -88,8 +88,6 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     public static final int REQUEST_STORAGE_PERMISSION = 1004;
     private CharSequence[] resDisplay = new CharSequence[]{"640x480", "1280x720", "1920x1080", "2560x1440",
             "3840x2160"};
-    // 默认分辨率
-    int width = 1280, height = 720;
 
     TextView txtStreamAddress;
     ImageView btnSwitchCemera;
@@ -505,25 +503,25 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         );
     }
 
-    /*
-     * 获取可以支持的分辨率
-     * */
-    @Subscribe
-    public void onSupportResolution(SupportResolution res) {
-        runOnUiThread(() -> {
-            listResolution = Util.getSupportResolution(getApplicationContext());
-            boolean supportdefault = listResolution.contains(String.format("%dx%d", width, height));
-
-            if (!supportdefault) {
-                String r = listResolution.get(0);
-                String[] splitR = r.split("x");
-
-                width = Integer.parseInt(splitR[0]);
-                height = Integer.parseInt(splitR[1]);
-            }
-
-        });
-    }
+//    /*
+//     * 获取可以支持的分辨率
+//     * */
+//    @Subscribe
+//    public void onSupportResolution(SupportResolution res) {
+//        runOnUiThread(() -> {
+//            listResolution = Util.getSupportResolution(getApplicationContext());
+//            boolean supportdefault = listResolution.contains(String.format("%dx%d", width, height));
+//
+//            if (!supportdefault) {
+//                String r = listResolution.get(0);
+//                String[] splitR = r.split("x");
+//
+//                width = Integer.parseInt(splitR[0]);
+//                height = Integer.parseInt(splitR[1]);
+//            }
+//
+//        });
+//    }
 
     /*
      * 显示推流的状态
