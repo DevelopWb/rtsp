@@ -198,6 +198,22 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
     @Override
     protected void onPause() {
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!mNeedGrantedPermission) {
+            goonWithPermissionGranted();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        BUS.unregister(this);
         if (!mNeedGrantedPermission) {
             unbindService(conn);
             handler.removeCallbacksAndMessages(null);
@@ -219,21 +235,6 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             }
         }
 
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (!mNeedGrantedPermission) {
-            goonWithPermissionGranted();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        BUS.unregister(this);
         super.onDestroy();
     }
 
@@ -570,7 +571,10 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             new AlertDialog.Builder(this).setTitle("是否允许后台上传？")
                     .setMessage("您设置了使能摄像头后台采集,是否继续在后台采集并上传视频？如果是，记得直播结束后,再回来这里关闭直播。")
                     .setNeutralButton("后台采集", (dialogInterface, i) -> {
-                        StreamActivity.super.onBackPressed();
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        startActivity(intent);
                     })
                     .setPositiveButton("退出程序", (dialogInterface, i) -> {
                         mMediaStream.stopStream();

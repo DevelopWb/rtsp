@@ -139,9 +139,10 @@ public class HawkProperty {
     public static final String NEXT_WARN_UPDATE= "NEXT_WARN_UPDATE";
 
 
-
-
-
+    /**
+     * 默认摄像头
+     */
+    public static final String DEFAULT_CAMERA= "defaultcamera";
 
 
 }

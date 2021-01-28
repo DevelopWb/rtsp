@@ -58,7 +58,6 @@ public class MediaStream {
     static final String TAG = "MediaStream";
     int width = 1920, height = 1080;
     int framerate, bitrate;
-    int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
     MediaCodec mMediaCodec;
     WeakReference<SurfaceTexture> mSurfaceHolderRef;
     Camera mCamera;
@@ -78,6 +77,7 @@ public class MediaStream {
     private int frameWidth;
     private int frameHeight;
     private Camera.CameraInfo camInfo;
+    private int mCameraId;
 
     public MediaStream(Context context, SurfaceTexture texture) {
         this(context, texture, true);
@@ -85,6 +85,7 @@ public class MediaStream {
 
     public MediaStream(Context context, SurfaceTexture texture, boolean enableVideo) {
         mApplicationContext = context;
+        mCameraId = Hawk.get(HawkProperty.DEFAULT_CAMERA,0);
         mSurfaceHolderRef = new WeakReference(texture);
         mEasyPusher = new EasyPusher();
         mCameraThread = new HandlerThread("CAMERA") {
@@ -222,8 +223,9 @@ public class MediaStream {
             camInfo = new Camera.CameraInfo();
             Camera.getCameraInfo(mCameraId, camInfo);
             int cameraRotationOffset = camInfo.orientation;
-            if (mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT)
+            if (mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 cameraRotationOffset += 180;
+            }
             int rotate = (360 + cameraRotationOffset - mDgree) % 360;
             parameters.setRotation(rotate);
             parameters.setRecordingHint(true);
@@ -471,14 +473,14 @@ public class MediaStream {
 
             Log.i(TAG, "Stop VC");
         }
-        if (mRecordVC != null) {
-            mRecordVC.onVideoStop();
-        }
-
-        if (mMuxer != null) {
-            mMuxer.release();
-            mMuxer = null;
-        }
+//        if (mRecordVC != null) {
+//            mRecordVC.onVideoStop();
+//        }
+//
+//        if (mMuxer != null) {
+//            mMuxer.release();
+//            mMuxer = null;
+//        }
     }
 
     public Camera getCamera() {
@@ -514,6 +516,7 @@ public class MediaStream {
                     //现在是后置，变更为前置
                     if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {//代表摄像头的方位，CAMERA_FACING_FRONT前置      CAMERA_FACING_BACK后置
                         mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+                        Hawk.put(HawkProperty.DEFAULT_CAMERA,0);
                         createCamera();
                         startPreview();
                         break;
@@ -522,6 +525,7 @@ public class MediaStream {
                     //现在是前置， 变更为后置
                     if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {//代表摄像头的方位，CAMERA_FACING_FRONT前置      CAMERA_FACING_BACK后置
                         mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+                        Hawk.put(HawkProperty.DEFAULT_CAMERA,1);
                         createCamera();
                         startPreview();
                         break;
