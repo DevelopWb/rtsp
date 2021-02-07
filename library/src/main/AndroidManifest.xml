@@ -20,13 +20,6 @@
         android:required="true" />
 
     <application>
-        <service
-            android:name="org.easydarwin.push.PushScreenService"
-            android:enabled="true" />
-
-        <service
-            android:name="org.easydarwin.push.UVCCameraService"
-            android:enabled="true" />
 
 
         <service

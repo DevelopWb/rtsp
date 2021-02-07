@@ -15,8 +15,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.easydarwin.push.MediaStream;
-
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 

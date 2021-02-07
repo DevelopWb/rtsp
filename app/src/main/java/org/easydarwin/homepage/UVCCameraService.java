@@ -46,9 +46,8 @@ public class UVCCameraService extends Service {
 
         @Override
         public synchronized void startPreview() {
-            if (prev) {
+            if (prev)
                 return;
-            }
 
             super.startPreview();
             prev = true;
@@ -56,9 +55,8 @@ public class UVCCameraService extends Service {
 
         @Override
         public synchronized void stopPreview() {
-            if (!prev) {
+            if (!prev)
                 return;
-            }
 
             super.stopPreview();
             prev = false;
