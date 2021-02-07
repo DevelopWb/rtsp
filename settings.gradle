@@ -1,2 +1,2 @@
-include ':app', ':library', ':myapplication', ':RegMode', ':base_net_lib', ':module_Base'
+include ':app', ':library', ':RegMode', ':base_net_lib', ':module_Base'
 

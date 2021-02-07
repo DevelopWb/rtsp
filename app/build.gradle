@@ -12,6 +12,7 @@ android {
         versionName configs.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         flavorDimensions "versionCode"
+        multiDexEnabled true
         ndk {
             //设置支持的SO库架构
             abiFilters 'armeabi-v7a'
@@ -57,28 +58,20 @@ repositories {
         dirs 'libs'
     }
     mavenCentral()
+    google()
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation(name: 'update-release', ext: 'aar')
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:preference-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'com.github.chrisbanes:PhotoView:1.3.0'
-    implementation 'com.squareup:otto:1.3.8'
-
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
+    implementation(name: 'update-release', ext: 'aar') {
+        exclude group: 'com.google.zxing'
     }
-
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:preference-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.squareup:otto:1.3.8'
+    //扫描
     implementation 'com.budiyev.android:code-scanner:1.9.4'
-
-
-    implementation 'com.umeng.analytics:analytics:latest.integration'
     implementation project(':library')
     implementation project(path: ':RegMode')
     implementation project(path: ':module_Base')
