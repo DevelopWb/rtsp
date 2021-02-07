@@ -2,26 +2,11 @@ apply plugin: 'com.android.library'
 def configs = rootProject.ext.android
 android {
     compileSdkVersion configs.compileSdkVersion
-//    buildToolsVersion '28.0.3'
-
-    defaultConfig {
-        minSdkVersion configs.minSdkVersion
-        targetSdkVersion configs.targetSdkVersion
-        consumerProguardFiles 'proguard-rules.pro'
-
-        buildConfigField 'boolean', 'MEDIA_DEBUG', 'false'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 
 }
 
 
 dependencies {
     implementation "com.android.support:appcompat-v7:$rootProject.supportVersion"
+    implementation "com.android.support:support-v4:$rootProject.supportVersion"
 }

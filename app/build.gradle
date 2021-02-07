@@ -57,8 +57,6 @@ repositories {
     flatDir {
         dirs 'libs'
     }
-    mavenCentral()
-    google()
 }
 
 dependencies {

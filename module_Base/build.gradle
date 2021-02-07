@@ -4,33 +4,6 @@ def configs = rootProject.ext.android
 def librarys = rootProject.ext.dependencies
 android {
     compileSdkVersion configs.compileSdkVersion
-
-    defaultConfig {
-        minSdkVersion configs.minSdkVersion
-        targetSdkVersion configs.targetSdkVersion
-        versionCode configs.versionCode
-        versionName configs.versionName
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [AROUTER_MODULE_NAME: project.getName()]
-            }
-        }
-    }
-
-    buildTypes {
-        release {
-            consumerProguardFiles 'proguard-rules.pro'
-        }
-
-        debug {
-                consumerProguardFiles 'proguard-rules.pro'
-        }
-
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
