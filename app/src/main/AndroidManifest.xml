@@ -44,6 +44,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name="org.easydarwin.homepage.UVCCameraService"
+            android:enabled="true"></service>
         <provider
             android:name="org.easydarwin.mine.MyFileProvider"
             android:authorities="${applicationId}.fileProvider"
@@ -58,7 +60,7 @@
         <activity
             android:name="org.easydarwin.homepage.StreamActivity"
             android:launchMode="singleInstance"
-            android:screenOrientation="landscape"></activity>
+           ></activity>
 
         <activity android:name="org.easydarwin.mine.AboutActivity" />
 

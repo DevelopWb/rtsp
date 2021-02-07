@@ -127,7 +127,9 @@ public class MediaStream extends Service implements LifecycleObserver {
                 }
             };
             Context c = context.get();
-            if (c == null) return;
+            if (c == null) {
+                return;
+            }
             Intent serv = new Intent(c, MediaStream.class);
             if (!c.bindService(serv, conn, 0)){
                 s.onError(new IllegalStateException("bindService error!"));
@@ -138,7 +140,9 @@ public class MediaStream extends Service implements LifecycleObserver {
         @OnLifecycleEvent(value = Lifecycle.Event.ON_DESTROY)
         void destory(){
             Context c = context.get();
-            if (c == null) return;
+            if (c == null) {
+                return;
+            }
             c.unbindService(conn);
         }
     }
@@ -312,7 +316,9 @@ public class MediaStream extends Service implements LifecycleObserver {
                     onPreviewFrame2(data, uvcCamera);
                     cache.offer(data);
                 }
-                if (uvcCamera == null) return;
+                if (uvcCamera == null) {
+                    return;
+                }
                 mCameraHandler.post(this);
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
@@ -330,7 +336,9 @@ public class MediaStream extends Service implements LifecycleObserver {
     final IFrameCallback uvcFrameCallback = new IFrameCallback() {
         @Override
         public void onFrame(ByteBuffer frame) {
-            if (uvcCamera == null) return;
+            if (uvcCamera == null) {
+                return;
+            }
             Thread.currentThread().setName("UVCCamera");
             frame.clear();
             byte[] data = cache.poll();
@@ -372,6 +380,7 @@ public class MediaStream extends Service implements LifecycleObserver {
 
         mSurfaceHolderRef = new WeakReference(null);
         mCameraThread = new HandlerThread("CAMERA") {
+            @Override
             public void run() {
                 try {
                     super.run();
@@ -527,24 +536,29 @@ public class MediaStream extends Service implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void start() {
-        if (cameraOpened)
+        if (cameraOpened) {
             if (cameraCanOpenNow()) {
                 createCamera();
                 startPreview();
             }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void stop() {
-        if (cameraOpened)
+        if (cameraOpened) {
             stopPreview();
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void destory() {
-        if (false)
-        closeCameraPreview();
-        if (lifecycle != null) lifecycle.removeObserver(this);
+        if (false) {
+            closeCameraPreview();
+        }
+        if (lifecycle != null) {
+            lifecycle.removeObserver(this);
+        }
     }
 
     @MainThread
@@ -598,7 +612,9 @@ public class MediaStream extends Service implements LifecycleObserver {
                 infos = listEncoders(MediaFormat.MIMETYPE_VIDEO_AVC);
             }
         }else{
-            if (try265Encode) info.hevcEncode = true;
+            if (try265Encode) {
+                info.hevcEncode = true;
+            }
         }
         if (!infos.isEmpty()) {
             CodecInfo ci = infos.get(0);
@@ -651,7 +667,9 @@ public class MediaStream extends Service implements LifecycleObserver {
 //            mCameraId = 0;
         }
 
-        if (mCamera != null) return;
+        if (mCamera != null) {
+            return;
+        }
         if (!enanleVideo) {
             return;
         }
@@ -670,8 +688,9 @@ public class MediaStream extends Service implements LifecycleObserver {
             Camera.CameraInfo camInfo = new Camera.CameraInfo();
             Camera.getCameraInfo(mCameraId, camInfo);
             int cameraRotationOffset = camInfo.orientation;
-            if (mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT)
+            if (mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 cameraRotationOffset += 180;
+            }
             int rotate = (360 + cameraRotationOffset - mDgree) % 360;
             parameters.setRotation(rotate);
             parameters.setRecordingHint(true);
@@ -795,7 +814,9 @@ public class MediaStream extends Service implements LifecycleObserver {
             mVC.setMuxer(null);
             audioStream.setMuxer(null);
         }
-        if (mMuxer != null) mMuxer.release();
+        if (mMuxer != null) {
+            mMuxer.release();
+        }
         mMuxer = null;
     }
 
@@ -955,10 +976,12 @@ public class MediaStream extends Service implements LifecycleObserver {
             audioStream.stop();
             audioStream = null;
         }
-        if (mVC != null)
+        if (mVC != null) {
             mVC.onVideoStop();
-        if (overlay != null)
+        }
+        if (overlay != null) {
             overlay.release();
+        }
 
         if (mMuxer != null) {
             mMuxer.release();
@@ -971,7 +994,9 @@ public class MediaStream extends Service implements LifecycleObserver {
         return new Publisher<Camera>() {
             @Override
             public void subscribe(final Subscriber<? super Camera> s) {
-                if (mCameraHandler == null) s.onError(new IllegalStateException());
+                if (mCameraHandler == null) {
+                    s.onError(new IllegalStateException());
+                }
                 if (!mCameraHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -1036,7 +1061,9 @@ public class MediaStream extends Service implements LifecycleObserver {
                 isCameraBack = true;
             }
             try {
-                if (!enanleVideo) return;
+                if (!enanleVideo) {
+                    return;
+                }
                 if (mTargetCameraId != -1 && mCameraId == mTargetCameraId) {
                     if (uvcCamera != null || mCamera != null) {
                         return;
@@ -1188,7 +1215,9 @@ public class MediaStream extends Service implements LifecycleObserver {
                         uvcCamera.setPreviewDisplay(new Surface(texture));
                     }else {
                         stopPreview();
-                        if (cameraOpened) openCameraPreview();
+                        if (cameraOpened) {
+                            openCameraPreview();
+                        }
                     }
                 }
             });
@@ -1198,7 +1227,9 @@ public class MediaStream extends Service implements LifecycleObserver {
 
     @MainThread
     public void notifyPermissionGranted() {
-        if (cameraOpened) openCameraPreview();
+        if (cameraOpened) {
+            openCameraPreview();
+        }
     }
 
     protected void release() {

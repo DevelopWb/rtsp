@@ -1,4 +1,4 @@
-package org.easydarwin.push;
+package org.easydarwin.homepage;
 
 import android.app.Service;
 import android.arch.lifecycle.LiveData;
@@ -95,9 +95,9 @@ public class UVCCameraService extends Service {
         }
     }
 
-    //    public void reRequestOtg() {
-    //        mUSBMonitor.requestPermission(DCPubic.usbDevice);
-    //    }
+//    public void reRequestOtg() {
+//        mUSBMonitor.requestPermission(DCPubic.usbDevice);
+//    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -116,7 +116,7 @@ public class UVCCameraService extends Service {
             @Override
             public void onAttach(final UsbDevice device) {
                 Log.v(TAG, "onAttach:" + device);
-                //                DCPubic.usbDevice = device;
+//                DCPubic.usbDevice = device;
                 uvcAttached = true;
                 mUSBMonitor.requestPermission(device);
                 EventBus.getDefault().post(UVC_ONATTACH);
@@ -151,10 +151,10 @@ public class UVCCameraService extends Service {
                         }
                     });
 
-                    //					camera.setPreviewTexture(camera.getSurfaceTexture());
+//					camera.setPreviewTexture(camera.getSurfaceTexture());
                     mUVCCamera = camera;
                     liveData.postValue(camera);
-                    //                    Toast.makeText(UVCCameraService.this, "UVCCamera connected!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(UVCCameraService.this, "UVCCamera connected!", Toast.LENGTH_SHORT).show();
                     EventBus.getDefault().post(UVC_ONCONNECT);
                     if (device != null){
                         cameras.append(device.getDeviceId(), camera);
@@ -170,9 +170,9 @@ public class UVCCameraService extends Service {
             public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
                 Log.v(TAG, "onDisconnect:");
                 uvcConnected = false;
-                //                Toast.makeText(MainActivity.this, R.string.usb_camera_disconnected, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, R.string.usb_camera_disconnected, Toast.LENGTH_SHORT).show();
 
-                //                releaseCamera();
+//                releaseCamera();
 
                 if (device != null) {
                     //设备还存在 没有拔下来
@@ -191,9 +191,9 @@ public class UVCCameraService extends Service {
                 }
                 EventBus.getDefault().post(UVC_ONDISSCONNECT);
 
-                //                mUSBMonitor = new USBMonitor(OutterCameraService.this, this);
-                //                mUSBMonitor.setDeviceFilter(DeviceFilter.getDeviceFilters(OutterCameraService.this, R.xml.device_filter));
-                //                mUSBMonitor.register();
+//                mUSBMonitor = new USBMonitor(OutterCameraService.this, this);
+//                mUSBMonitor.setDeviceFilter(DeviceFilter.getDeviceFilters(OutterCameraService.this, R.xml.device_filter));
+//                mUSBMonitor.register();
             }
 
             @Override
@@ -205,7 +205,7 @@ public class UVCCameraService extends Service {
             public void onDettach(final UsbDevice device) {
                 Log.v(TAG, "onDettach:");
                 releaseCamera();
-                //                AppContext.getInstance().bus.post(new UVCCameraDisconnect());
+//                AppContext.getInstance().bus.post(new UVCCameraDisconnect());
             }
         });
 

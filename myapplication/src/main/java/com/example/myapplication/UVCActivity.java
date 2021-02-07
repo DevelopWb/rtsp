@@ -19,7 +19,6 @@ import org.easydarwin.push.MediaStream;
 
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class UVCActivity extends AppCompatActivity {
     private MediaStream mediaStream;

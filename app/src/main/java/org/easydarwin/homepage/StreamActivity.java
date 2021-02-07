@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -26,31 +25,24 @@ import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.juntai.wisdom.basecomponent.utils.ToastUtils;
 import com.orhanobut.hawk.Hawk;
-import com.regmode.RegLatestContact;
-import com.regmode.Utils.RegOperateManager;
 import com.squareup.otto.Subscribe;
 
 import org.easydarwin.BaseProjectActivity;
 import org.easydarwin.bus.StartRecord;
 import org.easydarwin.bus.StopRecord;
 import org.easydarwin.bus.StreamStat;
-import org.easydarwin.bus.SupportResolution;
 import org.easydarwin.mine.AboutActivity;
 import org.easydarwin.easypusher.BuildConfig;
 import org.easydarwin.MyApp;
@@ -60,7 +52,6 @@ import org.easydarwin.mine.SettingActivity;
 import org.easydarwin.push.EasyPusher;
 import org.easydarwin.push.InitCallback;
 import org.easydarwin.push.MediaStream;
-import org.easydarwin.update.UpdateMgr;
 import org.easydarwin.util.Config;
 import org.easydarwin.util.HawkProperty;
 import org.easydarwin.util.SPUtil;
@@ -155,20 +146,20 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
-            @Override
-            public void toFinishActivity() {
-                finish();
-            }
-
-            @Override
-            public void toDoNext() {
-                if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
-                    onStartOrStopPush();
-                }
-
-            }
-        });
+//        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+//            @Override
+//            public void toFinishActivity() {
+//                finish();
+//            }
+//
+//            @Override
+//            public void toDoNext() {
+//                if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
+//                    onStartOrStopPush();
+//                }
+//
+//            }
+//        });
         setContentView(R.layout.activity_main);
         initView();
         BUS.register(this);

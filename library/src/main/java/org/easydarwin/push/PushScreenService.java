@@ -30,7 +30,6 @@ import android.view.WindowManager;
 
 import org.easydarwin.easypusher.BuildConfig;
 import org.easydarwin.easypusher.R;
-import org.easydarwin.muxer.EasyMuxer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
