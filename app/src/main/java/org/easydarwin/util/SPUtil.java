@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
  * SharedPreferences存储工具
  * */
 public class SPUtil {
+    public static final int   BITRATEKBPS = 2000000;
 
     /* ============================ 使用软编码 ============================ */
     private static final String KEY_SW_CODEC = "key-sw-codec";
@@ -181,4 +182,18 @@ public class SPUtil {
                 .putString(KEY_SCREEN_PUSHING_PORT, value)
                 .apply();
     }
+
+    private static final String KEY_SCREEN_PUSHING_CAMERA = "screen_pushing_res_camera";
+    public static int getScreenPushingCameraIndex(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(KEY_SCREEN_PUSHING_CAMERA, 0);
+    }
+
+    public static void setScreenPushingCameraIndex(Context context, int value) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putInt(KEY_SCREEN_PUSHING_CAMERA, value)
+                .apply();
+    }
+
 }

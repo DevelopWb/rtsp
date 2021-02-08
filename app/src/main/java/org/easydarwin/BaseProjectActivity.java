@@ -8,6 +8,11 @@ import android.view.View;
 import com.juntai.wisdom.basecomponent.utils.ActivityManagerTool;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
+import org.easydarwin.util.SPUtil;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 /**
  * @Author: tobato
  * @Description: 作用描述
@@ -17,13 +22,20 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
  */
 public abstract class BaseProjectActivity extends RxAppCompatActivity {
 
+    public abstract void onUvcCameraConnected();
 
+    public abstract void onUvcCameraAttached();
+
+    public abstract void onUvcCameraDisConnected();
     protected Context mContext;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         ActivityManagerTool.getInstance().addActivity(this);
     }
 
@@ -31,9 +43,31 @@ public abstract class BaseProjectActivity extends RxAppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mContext = null;
+        EventBus.getDefault().unregister(this);
         ActivityManagerTool.getInstance().removeActivity(this);
     }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void receivedStringMsg(String msg) {
+        switch (msg) {
+            case "onAttach":
+                //                Toast.makeText(getApplicationContext(),"Attached",Toast.LENGTH_SHORT).show();
+                onUvcCameraAttached();
+                break;
+            case "onConnect":
+                //                Toast.makeText(getApplicationContext(),"connect",Toast.LENGTH_SHORT).show();
+                SPUtil.setBitrateKbps(this,5000000);
+                onUvcCameraConnected();
+                break;
+            case "onDisconnect":
+                SPUtil.setBitrateKbps(this,SPUtil.BITRATEKBPS);
+                //                Toast.makeText(getApplicationContext(),"disconnect",Toast.LENGTH_SHORT).show();
 
+                onUvcCameraDisConnected();
+                break;
+            default:
+                break;
+        }
+    }
 
     /**
      * 隐藏控件  Invisible  gone

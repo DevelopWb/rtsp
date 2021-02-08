@@ -57,8 +57,9 @@
         </provider>
         <activity
             android:name="org.easydarwin.homepage.StreamActivity"
+            android:configChanges="orientation|keyboard|screenSize"
             android:launchMode="singleInstance"
-           ></activity>
+            android:screenOrientation="portrait" />
 
         <activity android:name="org.easydarwin.mine.AboutActivity" />
 
@@ -79,7 +80,9 @@
         <service
             android:name="org.easydarwin.homepage.BackgroundCameraService"
             android:enabled="true" />
-
+        <service
+            android:name="org.easydarwin.push.UVCCameraService"
+            android:enabled="true" />
     </application>
 
 </manifest>

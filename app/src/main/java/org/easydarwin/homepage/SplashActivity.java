@@ -28,6 +28,21 @@ import org.easydarwin.easypusher.R;
 public class SplashActivity extends BaseProjectActivity {
 
     @Override
+    public void onUvcCameraConnected() {
+
+    }
+
+    @Override
+    public void onUvcCameraAttached() {
+
+    }
+
+    @Override
+    public void onUvcCameraDisConnected() {
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_activity);

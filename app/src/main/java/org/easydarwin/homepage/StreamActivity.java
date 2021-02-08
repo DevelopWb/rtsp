@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -26,17 +27,21 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Display;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.juntai.wisdom.basecomponent.utils.ToastUtils;
 import com.orhanobut.hawk.Hawk;
+import com.regmode.RegLatestContact;
+import com.regmode.Utils.RegOperateManager;
 import com.squareup.otto.Subscribe;
 
 import org.easydarwin.BaseProjectActivity;
@@ -52,6 +57,7 @@ import org.easydarwin.mine.SettingActivity;
 import org.easydarwin.push.EasyPusher;
 import org.easydarwin.push.InitCallback;
 import org.easydarwin.push.MediaStream;
+import org.easydarwin.push.UVCCameraService;
 import org.easydarwin.util.Config;
 import org.easydarwin.util.HawkProperty;
 import org.easydarwin.util.SPUtil;
@@ -81,7 +87,6 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             "3840x2160"};
 
     TextView txtStreamAddress;
-    ImageView btnSwitchCemera;
     TextView txtStatus, streamStat;
     TextView textRecordTick;
 
@@ -103,6 +108,57 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
     private long mExitTime;//声明一个long类型变量：用于存放上一点击“返回键”的时刻
     private TextView mScreenResTv;
+    private UVCCameraService mUvcService;
+    private ServiceConnection connUVC;
+    TextView mSelectCameraTv;
+    private final static int UVC_CONNECT = 111;
+    private final static int UVC_DISCONNECT = 112;
+    public static boolean IS_VERTICAL_SCREEN = true;//是否是竖屏
+
+    private boolean isBackPush = false;//后台录制
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_STATE:
+                    String state = msg.getData().getString("state");
+                    txtStatus.setText(state);
+                    break;
+                case UVC_CONNECT:
+
+                    break;
+                case UVC_DISCONNECT:
+                    stopPushStream();
+                    initSurfaceViewLayout(0);
+                    int position = SPUtil.getScreenPushingCameraIndex(StreamActivity.this);
+                    if (2 == position) {
+                        position = 0;
+                        SPUtil.setScreenPushingCameraIndex(StreamActivity.this, position);
+                    }
+                    switch (position) {
+                        case 0:
+                            mSelectCameraTv.setText("摄像头:后置");
+                            mMediaStream.switchCamera(MediaStream.CAMERA_FACING_BACK);
+                            break;
+                        case 1:
+                            mSelectCameraTv.setText("摄像头:前置");
+                            mMediaStream.switchCamera(MediaStream.CAMERA_FACING_FRONT);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    String title = resDisplay[getIndex(resDisplay,
+                            Hawk.get(HawkProperty.KEY_NATIVE_HEIGHT,
+                            MediaStream.nativeHeight))].toString();
+                    mScreenResTv.setText(String.format("分辨率:%s", title));
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
     // 录像时的线程
     private Runnable mRecordTickRunnable = new Runnable() {
         @Override
@@ -124,21 +180,13 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         }
     };
 
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_STATE:
-                    String state = msg.getData().getString("state");
-                    txtStatus.setText(state);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
+
     private ImageView mPushStreamIv;
     private LinearLayout mPushStreamLl;
+    private ImageView mSwitchOritation;
+    private TextureView surfaceView;
+    private View pushScreen;
+    private ImageView push_screen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,25 +194,24 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-//        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
-//            @Override
-//            public void toFinishActivity() {
-//                finish();
-//            }
-//
-//            @Override
-//            public void toDoNext() {
-//                if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
-//                    onStartOrStopPush();
-//                }
-//
-//            }
-//        });
+                RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+                    @Override
+                    public void toFinishActivity() {
+                        finish();
+                    }
+
+                    @Override
+                    public void toDoNext() {
+                        if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
+                            onStartOrStopPush();
+                        }
+
+                    }
+                });
         setContentView(R.layout.activity_main);
         initView();
+        initSurfaceViewLayout(0);
         BUS.register(this);
-        notifyAboutColorChange();
-
         // 动态获取camera和audio权限
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PERMISSION_GRANTED) {
@@ -178,6 +225,14 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     }
 
     private void initView() {
+        surfaceView = findViewById(R.id.sv_surfaceview);
+        surfaceView.setSurfaceTextureListener(this);
+        surfaceView.setOnClickListener(this);
+        mSwitchOritation = (ImageView) findViewById(R.id.switch_oritation_iv);
+        mSwitchOritation.setOnClickListener(this);
+        mSelectCameraTv = findViewById(R.id.select_camera_tv);
+        mSelectCameraTv.setOnClickListener(this);
+        mSelectCameraTv.setText("摄像头:" + getSelectedCamera());
         mScreenResTv = findViewById(R.id.txt_res);
         mPushStreamIv = findViewById(R.id.streaming_activity_push);
         mPushStreamLl = findViewById(R.id.push_stream_ll);
@@ -185,6 +240,13 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         mPushStreamLl.setOnClickListener(this);
         String title = resDisplay[Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2)].toString();
         mScreenResTv.setText(String.format("分辨率:%s", title));
+        streamStat = findViewById(R.id.stream_stat);
+        txtStatus = findViewById(R.id.txt_stream_status);
+        txtStreamAddress = findViewById(R.id.txt_stream_address);
+        textRecordTick = findViewById(R.id.tv_start_record);
+        pushScreen = findViewById(R.id.push_screen_container);
+        push_screen = findViewById(R.id.streaming_activity_push_screen);
+        streamStat.setText(null);
     }
 
     @Override
@@ -196,7 +258,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
-
+        isBackPush = false;//后台录制
         if (!mNeedGrantedPermission) {
             goonWithPermissionGranted();
         }
@@ -223,6 +285,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                 mMediaStream = null;
 
                 stopService(new Intent(this, BackgroundCameraService.class));
+                stopService(new Intent(this, UVCCameraService.class));
             }
         }
 
@@ -299,24 +362,10 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     }
 
     private void goonWithPermissionGranted() {
-        streamStat = findViewById(R.id.stream_stat);
-        txtStatus = findViewById(R.id.txt_stream_status);
-        btnSwitchCemera = findViewById(R.id.btn_switchCamera);
-        txtStreamAddress = findViewById(R.id.txt_stream_address);
-        textRecordTick = findViewById(R.id.tv_start_record);
-        final TextureView surfaceView = findViewById(R.id.sv_surfaceview);
-        View pushScreen = findViewById(R.id.push_screen_container);
-        ImageView push_screen = findViewById(R.id.streaming_activity_push_screen);
-
-        streamStat.setText(null);
-        btnSwitchCemera.setOnClickListener(this);
-        surfaceView.setSurfaceTextureListener(this);
-        surfaceView.setOnClickListener(this);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             pushScreen.setVisibility(View.GONE);
         }
-
         if (RecordService.mEasyPusher != null) {
             push_screen.setImageResource(R.drawable.push_screen_click);
             TextView viewById = findViewById(R.id.push_screen_url);
@@ -336,10 +385,12 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 mService = ((BackgroundCameraService.LocalBinder) iBinder).getService();
-
-                if (surfaceView.isAvailable()) {
-                    goonWithAvailableTexture(surfaceView.getSurfaceTexture());
+                if (!UVCCameraService.uvcConnected) {
+                    if (surfaceView.isAvailable()) {
+                        goonWithAvailableTexture(surfaceView.getSurfaceTexture());
+                    }
                 }
+
             }
 
             @Override
@@ -349,7 +400,23 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         };
 
         bindService(new Intent(this, BackgroundCameraService.class), conn, 0);
+        startService(new Intent(this, UVCCameraService.class));
+        if (connUVC == null) {
+            connUVC = new ServiceConnection() {
 
+
+                @Override
+                public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                    mUvcService = ((UVCCameraService.LocalBinder) iBinder).getService();
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName componentName) {
+
+                }
+            };
+        }
+        bindService(new Intent(this, UVCCameraService.class), connUVC, 0);
         if (MyApp.getEasyApplication().mRecording) {
             textRecordTick.setVisibility(View.VISIBLE);
             textRecordTick.removeCallbacks(mRecordTickRunnable);
@@ -361,24 +428,19 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     }
 
     /*
-     * 显示key有效期
-     * */
-    private void notifyAboutColorChange() {
-        ImageView iv = findViewById(R.id.toolbar_about);
-
-        if (MyApp.activeDays >= 9999) {
-            iv.setImageResource(R.drawable.green);
-        } else if (MyApp.activeDays > 0) {
-            iv.setImageResource(R.drawable.yellow);
-        } else {
-            iv.setImageResource(R.drawable.red);
-        }
-    }
-
-    /*
      * 初始化MediaStream
      * */
     private void goonWithAvailableTexture(SurfaceTexture surface) {
+        Configuration mConfiguration = getResources().getConfiguration(); //获取设置的配置信息
+        int ori = mConfiguration.orientation; //获取屏幕方向
+        if (ori == Configuration.ORIENTATION_LANDSCAPE) {
+            //横屏
+            IS_VERTICAL_SCREEN = false;
+        } else if (ori == Configuration.ORIENTATION_PORTRAIT) {
+            //竖屏
+            IS_VERTICAL_SCREEN = true;
+        }
+
         final File easyPusher = new File(Config.recordPath());
         easyPusher.mkdir();
 
@@ -495,25 +557,25 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         );
     }
 
-//    /*
-//     * 获取可以支持的分辨率
-//     * */
-//    @Subscribe
-//    public void onSupportResolution(SupportResolution res) {
-//        runOnUiThread(() -> {
-//            listResolution = Util.getSupportResolution(getApplicationContext());
-//            boolean supportdefault = listResolution.contains(String.format("%dx%d", width, height));
-//
-//            if (!supportdefault) {
-//                String r = listResolution.get(0);
-//                String[] splitR = r.split("x");
-//
-//                width = Integer.parseInt(splitR[0]);
-//                height = Integer.parseInt(splitR[1]);
-//            }
-//
-//        });
-//    }
+    //    /*
+    //     * 获取可以支持的分辨率
+    //     * */
+    //    @Subscribe
+    //    public void onSupportResolution(SupportResolution res) {
+    //        runOnUiThread(() -> {
+    //            listResolution = Util.getSupportResolution(getApplicationContext());
+    //            boolean supportdefault = listResolution.contains(String.format("%dx%d", width, height));
+    //
+    //            if (!supportdefault) {
+    //                String r = listResolution.get(0);
+    //                String[] splitR = r.split("x");
+    //
+    //                width = Integer.parseInt(splitR[0]);
+    //                height = Integer.parseInt(splitR[1]);
+    //            }
+    //
+    //        });
+    //    }
 
     /*
      * 显示推流的状态
@@ -562,6 +624,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             new AlertDialog.Builder(this).setTitle("是否允许后台上传？")
                     .setMessage("您设置了使能摄像头后台采集,是否继续在后台采集并上传视频？如果是，记得直播结束后,再回来这里关闭直播。")
                     .setNeutralButton("后台采集", (dialogInterface, i) -> {
+                        isBackPush = true;//后台录制
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.addCategory(Intent.CATEGORY_HOME);
@@ -598,8 +661,71 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
                 }
                 break;
-            case R.id.btn_switchCamera:
-                mMediaStream.switchCamera();
+            case R.id.select_camera_tv:
+                new AlertDialog.Builder(this).setTitle("选择摄像头").setSingleChoiceItems(getCameras(),
+                        getSelectedCameraIndex(), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (isStreaming()) {
+                                    Toast.makeText(StreamActivity.this, "正在推送中,无法切换摄像头",
+                                            Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    return;
+                                }
+                                if (2 == which) {
+                                    mUvcService.reRequestOtg();
+                                    try {
+                                        Thread.sleep(200);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                if (2 != which) {
+                                    SPUtil.setScreenPushingCameraIndex(StreamActivity.this, which);
+                                }
+                                switch (which) {
+                                    case 0:
+                                        initSurfaceViewLayout(0);
+                                        mSelectCameraTv.setText("摄像头:后置");
+                                        mMediaStream.switchCamera(MediaStream.CAMERA_FACING_BACK);
+                                        break;
+                                    case 1:
+                                        initSurfaceViewLayout(0);
+                                        mSelectCameraTv.setText("摄像头:前置");
+                                        mMediaStream.switchCamera(MediaStream.CAMERA_FACING_FRONT);
+                                        break;
+                                    case 2:
+                                        if (UVCCameraService.uvcConnected) {
+                                            mSelectCameraTv.setText("摄像头:外置");
+                                            SPUtil.setScreenPushingCameraIndex(StreamActivity.this, which);
+                                        } else {
+                                            ToastUtils.toast(mContext, "暂无外置摄像头");
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                dialog.dismiss();
+                            }
+                        }).show();
+
+                break;
+            case R.id.switch_oritation_iv:
+                if (mMediaStream != null) {
+                    if (mMediaStream.isStreaming()) {
+                        Toast.makeText(this, "正在推送中,无法更改屏幕方向", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+                int orientation = getRequestedOrientation();
+
+                if (orientation == SCREEN_ORIENTATION_UNSPECIFIED || orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
                 break;
             case R.id.txt_res:
                 setCameraRes(resDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2));
@@ -638,6 +764,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                             if (mMediaStream != null) {
                                 mMediaStream.updateResolution();
                             }
+                            initSurfaceViewLayout(0);
                         } else {
                             Hawk.put(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, position);
                             Hawk.put(HawkProperty.KEY_UVC_WIDTH, Integer.parseInt(titles[0]));
@@ -738,27 +865,6 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
 
     /*
-     * 切换屏幕方向
-     * */
-    public void onSwitchOrientation(View view) {
-        if (mMediaStream != null) {
-            if (mMediaStream.isStreaming()) {
-                Toast.makeText(this, "正在推送中,无法更改屏幕方向", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-        int orientation = getRequestedOrientation();
-
-        if (orientation == SCREEN_ORIENTATION_UNSPECIFIED || orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-
-    }
-
-    /*
      * 推流or停止
      * */
     public void onStartOrStopPush() {
@@ -820,6 +926,17 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         }
     }
 
+    /**
+     * 停止推流
+     */
+    private void stopPushStream() {
+        if (mMediaStream != null) {
+            mMediaStream.stopStream();
+            mPushStreamIv.setImageResource(R.drawable.start_push);
+        }
+
+    }
+
     /*
      * 关于我们
      * */
@@ -866,4 +983,200 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
     }
 
+    /**
+     * 获取摄像头数据
+     *
+     * @return
+     */
+    private CharSequence[] getCameras() {
+        return new CharSequence[]{"后置摄像头", "前置摄像头", "外置摄像头"};
+
+    }
+
+    /**
+     * 获取选择的摄像头的index
+     *
+     * @return
+     */
+    private String getSelectedCamera() {
+        int position = SPUtil.getScreenPushingCameraIndex(this);
+        if (0 == position) {
+            return "后置";
+        }
+        if (1 == position) {
+            return "前置";
+        }
+        if (2 == position) {
+            if (UVCCameraService.uvcConnected) {
+                return "外置";
+            } else {
+                SPUtil.setScreenPushingCameraIndex(this, 0);
+                return "后置";
+            }
+
+        }
+        return "";
+    }
+
+    /**
+     * 获取选择的摄像头的index
+     *
+     * @return
+     */
+    private int getSelectedCameraIndex() {
+        int position = SPUtil.getScreenPushingCameraIndex(this);
+        //        if (UVCCameraService.uvcConnected) {
+        //            SPUtil.setScreenPushingCameraIndex(this, 2);
+        //            return 2;
+        //        }
+        return position;
+
+    }
+
+    /**
+     * 初始化预览控件的布局
+     * type 0 代表原生摄像头 1代表otg摄像头
+     */
+    private void initSurfaceViewLayout(int type) {
+        int width = 0;
+        int height = 0;
+        Display mDisplay = getWindowManager().getDefaultDisplay();
+        int screenWidth = mDisplay.getWidth();
+        int screenHeight = mDisplay.getHeight();
+        if (0 == type) {
+            Log.e(TAG, "layout   原生摄像头");
+            int nativeWidth = Hawk.get(HawkProperty.KEY_NATIVE_WIDTH,
+                    MediaStream.nativeWidth);
+            int nativeHeight = Hawk.get(HawkProperty.KEY_NATIVE_HEIGHT,
+                    MediaStream.nativeHeight);
+            width = IS_VERTICAL_SCREEN ? nativeHeight : nativeWidth;
+            height = IS_VERTICAL_SCREEN ? nativeWidth : nativeHeight;
+        } else {
+            Log.e(TAG, "layout   OTG摄像头");
+
+            int uvcWidth = Hawk.get(HawkProperty.KEY_UVC_WIDTH,
+                    MediaStream.uvcWidth);
+            int uvcHeight = Hawk.get(HawkProperty.KEY_UVC_HEIGHT,
+                    MediaStream.uvcHeight);
+            width = IS_VERTICAL_SCREEN ? uvcHeight : uvcWidth;
+            height = IS_VERTICAL_SCREEN ? uvcWidth : uvcHeight;
+        }
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) surfaceView.getLayoutParams();
+        if (IS_VERTICAL_SCREEN) {
+            //竖屏模式 宽度固定
+            params.width = screenWidth;
+            if (0 == type) {
+                if (width < screenWidth) {
+                    params.height = height * screenWidth / width;
+                } else {
+                    params.height = height * width / screenWidth;
+                }
+            } else {
+                if (width < screenWidth) {
+                    params.height = height * screenWidth / width * 2 / 5;
+                } else {
+                    params.height = height * width / screenWidth / 3;
+                }
+            }
+
+
+        } else {
+            //横屏模式 高度固定
+            params.height = screenHeight;
+            if (height < screenHeight) {
+                params.width = width * screenHeight / height;
+            } else {
+                params.width = width * height / screenHeight;
+            }
+        }
+        surfaceView.setLayoutParams(params); //使设置好的布局参数应用到控件
+    }
+
+    /**
+     * 获取索引
+     *
+     * @param arrays
+     * @param height
+     */
+    public int getIndex(CharSequence[] arrays, int height) {
+        int index = 0;
+        for (int i = 0; i < arrays.length; i++) {
+            CharSequence str = arrays[i];
+            if (str.toString().contains(String.valueOf(height))) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+    /**
+     * 初始化otg摄像头的布局
+     */
+    private void initUvcLayout() {
+        initSurfaceViewLayout(1);
+        SPUtil.setScreenPushingCameraIndex(this, 2);
+        mSelectCameraTv.setText("摄像头:" + getSelectedCamera());
+    }
+
+    @Override
+    public void onUvcCameraConnected() {
+        //        Toast.makeText(getApplicationContext(),"connect",Toast.LENGTH_SHORT).show();
+        stopPushStream();
+        if (mMediaStream != null) {
+            mMediaStream.switchCamera(MediaStream.CAMERA_FACING_BACK_UVC);
+            int uvcWidth = Hawk.get(HawkProperty.KEY_UVC_WIDTH, MediaStream.uvcWidth);
+            int uvcHeight = Hawk.get(HawkProperty.KEY_UVC_HEIGHT, MediaStream.uvcHeight);
+            mScreenResTv.setText(String.format("%s%s%s%s", "分辨率:", uvcWidth, "x", uvcHeight));
+        }
+        try {
+            Thread.sleep(500);
+            initUvcLayout();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //        mScreenResTv.setVisibility(View.INVISIBLE);
+        //        mSwitchOritation.setVisibility(View.INVISIBLE);
+        //        String title = resUvcDisplay[Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, 1)].toString();
+        //        mScreenResTv.setText(String.format("分辨率:%s", title));
+    }
+
+
+    @Override
+    public void onUvcCameraAttached() {
+        //        Toast.makeText(getApplicationContext(),"Attached",Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onUvcCameraDisConnected() {
+        //        Toast.makeText(getApplicationContext(),"disconnect",Toast.LENGTH_SHORT).show();
+        handler.sendEmptyMessage(UVC_DISCONNECT);
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (!isBackPush) {
+
+            if (newConfig.orientation == newConfig.ORIENTATION_LANDSCAPE) {
+                //横屏
+                IS_VERTICAL_SCREEN = false;
+            } else {
+                //竖屏
+                IS_VERTICAL_SCREEN = true;
+            }
+            //横屏
+            if (surfaceView.isAvailable()) {
+                if (!UVCCameraService.uvcConnected) {
+                    initSurfaceViewLayout(0);
+                    goonWithAvailableTexture(surfaceView.getSurfaceTexture());
+                } else {
+                    initUvcLayout();
+                }
+            }
+        }
+        super.onConfigurationChanged(newConfig);
+    }
 }
+

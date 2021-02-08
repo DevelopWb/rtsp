@@ -8,6 +8,7 @@
 package org.easydarwin.util;
 
 import android.content.Context;
+import android.hardware.usb.UsbDevice;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ import com.orhanobut.hawk.Hawk;
  */
 public class Config {
 
+    public static UsbDevice usbDevice = null;
 
     public static String getServerURL(Context context) {
         return String.format("rtsp://%s:%s/%s",getIp(context),getPort(context),(String) Hawk.get(HawkProperty.REG_CODE));
