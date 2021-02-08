@@ -70,7 +70,6 @@ public class MediaStream {
     Camera mCamera;
     boolean pushStream = false;//是否要推送数据
     final AudioStream audioStream = AudioStream.getInstance();
-    private boolean isCameraBack = true;
     private int mDgree;
     private Context mContext;
     private boolean mSWCodec;
@@ -127,7 +126,7 @@ public class MediaStream {
         };
         this.enanleVideo = enableVideo;
 
-        if (enableVideo)
+        if (enableVideo) {
             previewCallback = new Camera.PreviewCallback() {
 
                 @Override
@@ -158,6 +157,7 @@ public class MediaStream {
                     mCamera.addCallbackBuffer(data);
                 }
             };
+        }
     }
 
     public void startStream(String url, InitCallback callback) {
@@ -282,19 +282,6 @@ public class MediaStream {
         }
     }
 
-    private void save2file(byte[] data, String path) {
-        if (true)
-            return;
-        try {
-            FileOutputStream fos = new FileOutputStream(path, true);
-            fos.write(data);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     // 根据Unicode编码完美的判断中文汉字和符号
     private static boolean isChinese(char c) {
@@ -308,14 +295,6 @@ public class MediaStream {
         return false;
     }
 
-    private int getTxtPixelLength(String txt, boolean zoomed) {
-        int length = 0;
-        int fontWidth = zoomed ? 16 : 8;
-        for (int i = 0; i < txt.length(); i++) {
-            length += isChinese(txt.charAt(i)) ? fontWidth * 2 : fontWidth;
-        }
-        return length;
-    }
 
     public synchronized void startRecord() {
         if (Thread.currentThread() != mCameraThread) {
@@ -388,7 +367,6 @@ public class MediaStream {
         }
 
         if (uvcCamera != null) {
-
             startUvcPreview();
             initConsumer(uvcWidth, uvcHeight);
         } else if (mCamera != null) {
@@ -579,6 +557,9 @@ public class MediaStream {
             });
             return;
         }
+        if (uvcCamera != null) {
+            uvcCamera.stopPreview();
+        }
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.setPreviewCallbackWithBuffer(null);
@@ -630,34 +611,18 @@ public class MediaStream {
         @Override
         public void run() {
             int cameraCount = 0;
-            if (isCameraBack) {
-                isCameraBack = false;
-            } else {
-                isCameraBack = true;
-            }
-            if (!enanleVideo) {
-                return;
-            }
-            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-            cameraCount = Camera.getNumberOfCameras();//得到摄像头的个数
-            for (int i = 0; i < cameraCount; i++) {
-                Camera.getCameraInfo(i, cameraInfo);//得到每一个摄像头的信息
-                stopPreview();
-                destroyCamera();
-                if (mCameraId == CAMERA_FACING_FRONT) {
-                    //现在是后置，变更为前置
-                    //      CAMERA_FACING_BACK后置
-                    createCamera();
-                    startPreview();
-                    break;
-                } else {
-                    //现在是前置， 变更为后置
-                    //     CAMERA_FACING_BACK后置
-                    createCamera();
-                    startPreview();
-                    break;
-                }
-            }
+//            if (!enanleVideo) {
+//                return;
+//            }
+//            if (mCameraId == CAMERA_FACING_BACK_UVC) {
+//                if (uvcCamera != null) {
+//                    return;
+//                }
+//            }
+            stopPreview();
+            destroyCamera();
+            createCamera();
+            startPreview();
         }
     };
 
@@ -691,6 +656,11 @@ public class MediaStream {
             Log.i(TAG, "release Camera");
             mCamera = null;
         }
+        if (uvcCamera != null) {
+            uvcCamera.destroy();
+            uvcCamera = null;
+        }
+
         if (mMuxer != null) {
             mMuxer.release();
             mMuxer = null;

@@ -194,20 +194,20 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-                RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
-                    @Override
-                    public void toFinishActivity() {
-                        finish();
-                    }
-
-                    @Override
-                    public void toDoNext() {
-                        if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
-                            onStartOrStopPush();
-                        }
-
-                    }
-                });
+//                RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+//                    @Override
+//                    public void toFinishActivity() {
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    public void toDoNext() {
+//                        if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
+//                            onStartOrStopPush();
+//                        }
+//
+//                    }
+//                });
         setContentView(R.layout.activity_main);
         initView();
         initSurfaceViewLayout(0);
@@ -259,8 +259,9 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
         isBackPush = false;//后台录制
+        goonWithPermissionGranted();
         if (!mNeedGrantedPermission) {
-            goonWithPermissionGranted();
+
         }
     }
 
@@ -271,7 +272,10 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             unbindService(conn);
             handler.removeCallbacksAndMessages(null);
         }
-
+        if (connUVC != null) {
+            unbindService(connUVC);
+            connUVC = null;
+        }
         boolean isStreaming = mMediaStream != null && mMediaStream.isStreaming();
 
         if (mMediaStream != null) {
@@ -964,7 +968,9 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
         if (mService != null) {
-            goonWithAvailableTexture(surface);
+            if (!UVCCameraService.uvcConnected) {
+                goonWithAvailableTexture(surface);
+            }
         }
     }
 
@@ -1129,7 +1135,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             mScreenResTv.setText(String.format("%s%s%s%s", "分辨率:", uvcWidth, "x", uvcHeight));
         }
         try {
-            Thread.sleep(500);
+            Thread.sleep(200);
             initUvcLayout();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -1159,7 +1165,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     public void onConfigurationChanged(Configuration newConfig) {
         if (!isBackPush) {
 
-            if (newConfig.orientation == newConfig.ORIENTATION_LANDSCAPE) {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 //横屏
                 IS_VERTICAL_SCREEN = false;
             } else {
