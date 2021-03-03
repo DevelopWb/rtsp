@@ -389,8 +389,8 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 mService = ((BackgroundCameraService.LocalBinder) iBinder).getService();
-                if (!UVCCameraService.uvcConnected) {
-                    if (surfaceView.isAvailable()) {
+                if (surfaceView.isAvailable()) {
+                    if (!UVCCameraService.uvcConnected) {
                         goonWithAvailableTexture(surfaceView.getSurfaceTexture());
                     }
                 }

@@ -233,6 +233,17 @@ public class MediaStream {
      * uvc 第一步是创建camera
      */
     private void createUvcCamera() {
+        boolean mHevc = false;//是否265编码  默认不能
+        ArrayList<CodecInfo> infos = listEncoders(mHevc ? MediaFormat.MIMETYPE_VIDEO_HEVC :
+                MediaFormat.MIMETYPE_VIDEO_AVC);
+
+        if (!infos.isEmpty()) {
+            CodecInfo ci = infos.get(0);
+            info.mName = ci.mName;
+            info.mColorFormat = ci.mColorFormat;
+        } else {
+            mSWCodec = true;
+        }
 
         uvcWidth = Hawk.get(com.juntai.wisdom.basecomponent.utils.HawkProperty.KEY_UVC_WIDTH, uvcWidth);
         uvcHeight = Hawk.get(com.juntai.wisdom.basecomponent.utils.HawkProperty.KEY_UVC_HEIGHT, uvcHeight);
@@ -260,6 +271,28 @@ public class MediaStream {
             mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
             createNativeCamera();
         }
+    }
+
+    /**
+     * uvc 第二步 开始预览
+     */
+    private void startUvcPreview() {
+
+        SurfaceTexture holder = mSurfaceHolderRef.get();
+        if (holder != null) {
+            uvcCamera.setPreviewTexture(holder);
+        }
+
+        try {
+            uvcCamera.setFrameCallback(uvcFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP/*UVCCamera.PIXEL_FORMAT_NV21
+               之前选的4*/);
+            uvcCamera.startPreview();
+            //            frameWidth = StreamActivity.IS_VERTICAL_SCREEN ? uvcHeight : uvcWidth;
+            //            frameHeight = StreamActivity.IS_VERTICAL_SCREEN ? uvcWidth/2 : uvcHeight;
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void createNativeCamera() {
@@ -353,7 +386,7 @@ public class MediaStream {
     }
 
     /**
-     * 开启预览
+     * 第二步 开启预览
      */
     public synchronized void startPreview() {
         if (Thread.currentThread() != mCameraThread) {
@@ -406,8 +439,7 @@ public class MediaStream {
         parameters.setRotation(rotate); // 设置Camera预览方向
         //            parameters.setRecordingHint(true);
         boolean mHevc = false;
-        ArrayList<CodecInfo> infos = listEncoders(mHevc ? MediaFormat.MIMETYPE_VIDEO_HEVC :
-                MediaFormat.MIMETYPE_VIDEO_AVC);
+        ArrayList<CodecInfo> infos = listEncoders(mHevc ? MediaFormat.MIMETYPE_VIDEO_HEVC : MediaFormat.MIMETYPE_VIDEO_AVC);
 
         if (!infos.isEmpty()) {
             CodecInfo ci = infos.get(0);
@@ -476,26 +508,6 @@ public class MediaStream {
         frameHeight = StreamActivity.IS_VERTICAL_SCREEN ? nativeWidth : nativeHeight;
     }
 
-    /**
-     * uvc 第二步 开始预览
-     */
-    private void startUvcPreview() {
-        SurfaceTexture holder = mSurfaceHolderRef.get();
-        if (holder != null) {
-            uvcCamera.setPreviewTexture(holder);
-        }
-
-        try {
-            uvcCamera.setFrameCallback(uvcFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP/*UVCCamera.PIXEL_FORMAT_NV21
-               之前选的4*/);
-            uvcCamera.startPreview();
-            //            frameWidth = StreamActivity.IS_VERTICAL_SCREEN ? uvcHeight : uvcWidth;
-            //            frameHeight = StreamActivity.IS_VERTICAL_SCREEN ? uvcWidth/2 : uvcHeight;
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-    }
 
     private void initConsumer(int width, int height) {
         //        mSWCodec = Hawk.get(HawkProperty.KEY_SW_CODEC, true);
@@ -575,14 +587,14 @@ public class MediaStream {
 
             Log.i(TAG, "Stop VC");
         }
-        //        if (mRecordVC != null) {
-        //            mRecordVC.onVideoStop();
-        //        }
-        //
-        //        if (mMuxer != null) {
-        //            mMuxer.release();
-        //            mMuxer = null;
-        //        }
+        if (mRecordVC != null) {
+            mRecordVC.onVideoStop();
+        }
+
+        if (mMuxer != null) {
+            mMuxer.release();
+            mMuxer = null;
+        }
     }
 
     public Camera getCamera() {
@@ -611,14 +623,14 @@ public class MediaStream {
         @Override
         public void run() {
             int cameraCount = 0;
-//            if (!enanleVideo) {
-//                return;
-//            }
-//            if (mCameraId == CAMERA_FACING_BACK_UVC) {
-//                if (uvcCamera != null) {
-//                    return;
-//                }
-//            }
+            //            if (!enanleVideo) {
+            //                return;
+            //            }
+            if (mCameraId == CAMERA_FACING_BACK_UVC) {
+                if (uvcCamera != null) {
+                    return;
+                }
+            }
             stopPreview();
             destroyCamera();
             createCamera();
