@@ -40,6 +40,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.basenetlib.util.NetWorkUtil;
+import com.cxz.networklib.annotation.Network;
+import com.cxz.networklib.type.NetType;
 import com.juntai.wisdom.basecomponent.utils.ToastUtils;
 import com.orhanobut.hawk.Hawk;
 import com.regmode.RegLatestContact;
@@ -164,7 +167,10 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             @Override
             public void toDoNext() {
                 if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
-                    onStartOrStopPush();
+                    if (NetWorkUtil.isNetworkAvailable()) {
+                        onStartOrStopPush();
+                    }
+
                 }
 
             }
@@ -210,7 +216,21 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             goonWithPermissionGranted();
         }
     }
-
+    @Network(netType = NetType.AUTO)
+    public void network(NetType netType) {
+        switch (netType) {
+            case WIFI:
+                onStartOrStopPush();
+                break;
+            case CMNET:
+            case CMWAP:
+                onStartOrStopPush();
+                break;
+            case NONE:
+//                ToastUtils.toast(mContext,"没有网络");
+                break;
+        }
+    }
     @Override
     protected void onDestroy() {
         BUS.unregister(this);

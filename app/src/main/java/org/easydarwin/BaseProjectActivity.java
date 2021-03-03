@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.cxz.networklib.NetworkManager;
 import com.juntai.wisdom.basecomponent.utils.ActivityManagerTool;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
@@ -25,6 +26,8 @@ public abstract class BaseProjectActivity extends RxAppCompatActivity {
         super.onCreate(savedInstanceState);
         mContext = this;
         ActivityManagerTool.getInstance().addActivity(this);
+        // 注册
+        NetworkManager.getDefault().registerObserver(this);
     }
 
     @Override
