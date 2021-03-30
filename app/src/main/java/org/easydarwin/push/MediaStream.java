@@ -97,7 +97,7 @@ public class MediaStream {
         mContext = context;
         mCameraId = SPUtil.getScreenPushingCameraIndex(context);
         mSurfaceHolderRef = new WeakReference(texture);
-        mEasyPusher = new EasyPusher();
+
         mCameraThread = new HandlerThread("CAMERA") {
             @Override
             public void run() {
@@ -219,9 +219,11 @@ public class MediaStream {
             });
             return;
         }
+        mEasyPusher = new EasyPusher();
         if (!enanleVideo) {
             return;
         }
+        Log.d(UVCCameraService.TAG, "createCamera+++"+mCameraId);
         if (mCameraId == CAMERA_FACING_BACK_UVC) {
             createUvcCamera();
         } else {
@@ -245,9 +247,9 @@ public class MediaStream {
             mSWCodec = true;
         }
 
-        uvcWidth = Hawk.get(com.juntai.wisdom.basecomponent.utils.HawkProperty.KEY_UVC_WIDTH, uvcWidth);
-        uvcHeight = Hawk.get(com.juntai.wisdom.basecomponent.utils.HawkProperty.KEY_UVC_HEIGHT, uvcHeight);
-        Log.e(TAG, "otg宽" + uvcWidth + "otg高" + uvcHeight);
+        uvcWidth = Hawk.get(HawkProperty.KEY_UVC_WIDTH, uvcWidth);
+        uvcHeight = Hawk.get(HawkProperty.KEY_UVC_HEIGHT, uvcHeight);
+        Log.d(UVCCameraService.TAG, "createuvc"+"otg宽" + uvcWidth + "otg高" + uvcHeight);
         uvcCamera = UVCCameraService.liveData.getValue();
         if (uvcCamera != null) {
             try {
@@ -282,6 +284,7 @@ public class MediaStream {
         if (holder != null) {
             uvcCamera.setPreviewTexture(holder);
         }
+        Log.d(UVCCameraService.TAG, "startUvcPreview"+"otg宽" + uvcWidth + "otg高" + uvcHeight);
 
         try {
             uvcCamera.setFrameCallback(uvcFrameCallback, UVCCamera.PIXEL_FORMAT_YUV420SP/*UVCCamera.PIXEL_FORMAT_NV21
@@ -439,7 +442,8 @@ public class MediaStream {
         parameters.setRotation(rotate); // 设置Camera预览方向
         //            parameters.setRecordingHint(true);
         boolean mHevc = false;
-        ArrayList<CodecInfo> infos = listEncoders(mHevc ? MediaFormat.MIMETYPE_VIDEO_HEVC : MediaFormat.MIMETYPE_VIDEO_AVC);
+        ArrayList<CodecInfo> infos = listEncoders(mHevc ? MediaFormat.MIMETYPE_VIDEO_HEVC :
+                MediaFormat.MIMETYPE_VIDEO_AVC);
 
         if (!infos.isEmpty()) {
             CodecInfo ci = infos.get(0);
@@ -569,6 +573,7 @@ public class MediaStream {
             });
             return;
         }
+        Log.d(UVCCameraService.TAG, "mediaCamera++++++++stopPreview:");
         if (uvcCamera != null) {
             uvcCamera.stopPreview();
         }
@@ -591,10 +596,10 @@ public class MediaStream {
             mRecordVC.onVideoStop();
         }
 
-        if (mMuxer != null) {
-            mMuxer.release();
-            mMuxer = null;
-        }
+//        if (mMuxer != null) {
+//            mMuxer.release();
+//            mMuxer = null;
+//        }
     }
 
     public Camera getCamera() {
@@ -622,10 +627,11 @@ public class MediaStream {
     private Runnable switchCameraTask = new Runnable() {
         @Override
         public void run() {
+            Log.d(UVCCameraService.TAG, "mediaStream====run==switchCameraTask:");
             int cameraCount = 0;
-            //            if (!enanleVideo) {
-            //                return;
-            //            }
+            if (!enanleVideo) {
+                return;
+            }
             if (mCameraId == CAMERA_FACING_BACK_UVC) {
                 if (uvcCamera != null) {
                     return;
@@ -658,6 +664,7 @@ public class MediaStream {
             });
             return;
         }
+        Log.d(UVCCameraService.TAG, "destroyCamera:");
         if (mCamera != null) {
             mCamera.stopPreview();
             try {

@@ -385,24 +385,24 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         Intent intent = new Intent(this, BackgroundCameraService.class);
         startService(intent);
 
-        conn = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                mService = ((BackgroundCameraService.LocalBinder) iBinder).getService();
-                if (surfaceView.isAvailable()) {
-                    if (!UVCCameraService.uvcConnected) {
-                        goonWithAvailableTexture(surfaceView.getSurfaceTexture());
+        if (conn == null) {
+            conn = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                    mService = ((BackgroundCameraService.LocalBinder) iBinder).getService();
+                    if (surfaceView.isAvailable()) {
+                        if (!UVCCameraService.uvcConnected) {
+                            goonWithAvailableTexture(surfaceView.getSurfaceTexture());
+                        }
                     }
                 }
 
-            }
+                @Override
+                public void onServiceDisconnected(ComponentName componentName) {
 
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-
+                }
+            };
+        }
         bindService(new Intent(this, BackgroundCameraService.class), conn, 0);
         startService(new Intent(this, UVCCameraService.class));
         if (connUVC == null) {
@@ -969,6 +969,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     public void onSurfaceTextureAvailable(final SurfaceTexture surface, int width, int height) {
         if (mService != null) {
             if (!UVCCameraService.uvcConnected) {
+                Log.d(UVCCameraService.TAG, "streamActivity++++++++onSurfaceTextureAvailable:");
                 goonWithAvailableTexture(surface);
             }
         }
@@ -1129,17 +1130,23 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         //        Toast.makeText(getApplicationContext(),"connect",Toast.LENGTH_SHORT).show();
         stopPushStream();
         if (mMediaStream != null) {
+            if (!UVCCameraService.uvcConnected) {
+                return;
+            }
+            Log.d(UVCCameraService.TAG, "StreamActivity======onUvcCameraConnected:");
+
             mMediaStream.switchCamera(MediaStream.CAMERA_FACING_BACK_UVC);
             int uvcWidth = Hawk.get(HawkProperty.KEY_UVC_WIDTH, MediaStream.uvcWidth);
             int uvcHeight = Hawk.get(HawkProperty.KEY_UVC_HEIGHT, MediaStream.uvcHeight);
             mScreenResTv.setText(String.format("%s%s%s%s", "分辨率:", uvcWidth, "x", uvcHeight));
         }
-        try {
-            Thread.sleep(200);
-            initUvcLayout();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        initUvcLayout();
+//        try {
+//            Thread.sleep(200);
+//            initUvcLayout();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         //        mScreenResTv.setVisibility(View.INVISIBLE);
         //        mSwitchOritation.setVisibility(View.INVISIBLE);

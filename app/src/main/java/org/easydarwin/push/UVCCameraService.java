@@ -67,7 +67,7 @@ public class UVCCameraService extends Service {
         }
     }
 
-    private static final String TAG = UVCCameraService.class.getSimpleName();
+    public static final String TAG = "UVCCAMERA_TAG";
 
     private USBMonitor mUSBMonitor;
     private UVCCamera mUVCCamera;
@@ -111,7 +111,7 @@ public class UVCCameraService extends Service {
         mUSBMonitor = new USBMonitor(this, new USBMonitor.OnDeviceConnectListener() {
             @Override
             public void onAttach(final UsbDevice device) {
-                Log.v(TAG, "onAttach:" + device);
+                Log.d(TAG, "onAttach:" + device);
                 Config.usbDevice = device;
                 uvcAttached = true;
                 mUSBMonitor.requestPermission(device);
@@ -122,9 +122,6 @@ public class UVCCameraService extends Service {
             public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew) {
                 releaseCamera();
                 uvcConnected = true;
-
-                Log.v(TAG, "onConnect:");
-
                 try {
                     final UVCCamera camera = new MyUVCCamera();
                     camera.open(ctrlBlock);
@@ -151,7 +148,10 @@ public class UVCCameraService extends Service {
                     mUVCCamera = camera;
                     liveData.postValue(camera);
 //                    Toast.makeText(UVCCameraService.this, "UVCCamera connected!", Toast.LENGTH_SHORT).show();
+
                     EventBus.getDefault().post("onConnect");
+                    Log.d(TAG, "onConnect:"+uvcConnected);
+
                     if (device != null){
                         cameras.append(device.getDeviceId(), camera);
                     }
@@ -164,8 +164,9 @@ public class UVCCameraService extends Service {
 
             @Override
             public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
-                Log.v(TAG, "onDisconnect:");
+
                 uvcConnected = false;
+                Log.d(TAG, "onDisconnect:");
 //                Toast.makeText(MainActivity.this, R.string.usb_camera_disconnected, Toast.LENGTH_SHORT).show();
 
 //                releaseCamera();

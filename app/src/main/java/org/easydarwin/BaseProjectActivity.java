@@ -3,11 +3,13 @@ package org.easydarwin;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
 import com.juntai.wisdom.basecomponent.utils.ActivityManagerTool;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
+import org.easydarwin.push.UVCCameraService;
 import org.easydarwin.util.SPUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -52,13 +54,20 @@ public abstract class BaseProjectActivity extends RxAppCompatActivity {
             case "onAttach":
                 //                Toast.makeText(getApplicationContext(),"Attached",Toast.LENGTH_SHORT).show();
                 onUvcCameraAttached();
+                Log.d(UVCCameraService.TAG, "BaseProjectActivity======onAttach:");
                 break;
             case "onConnect":
+                if (!UVCCameraService.uvcConnected) {
+                   return;
+                }
+                Log.d(UVCCameraService.TAG, "BaseProjectActivity======onConnect+++:"+UVCCameraService.uvcConnected);
+
                 //                Toast.makeText(getApplicationContext(),"connect",Toast.LENGTH_SHORT).show();
                 SPUtil.setBitrateKbps(this,5000000);
                 onUvcCameraConnected();
                 break;
             case "onDisconnect":
+                Log.d(UVCCameraService.TAG, "BaseProjectActivity======onDisconnect+++:"+UVCCameraService.uvcConnected);
                 SPUtil.setBitrateKbps(this,SPUtil.BITRATEKBPS);
                 //                Toast.makeText(getApplicationContext(),"disconnect",Toast.LENGTH_SHORT).show();
 
