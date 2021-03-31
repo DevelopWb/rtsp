@@ -5,11 +5,17 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <TextureView
-        android:id="@+id/sv_surfaceview"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true" />
+        android:layout_height="match_parent">
+
+        <TextureView
+            android:id="@+id/sv_surfaceview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:keepScreenOn="true" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/stream_stat"

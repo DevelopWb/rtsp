@@ -151,7 +151,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
                     String title = resDisplay[getIndex(resDisplay,
                             Hawk.get(HawkProperty.KEY_NATIVE_HEIGHT,
-                            MediaStream.nativeHeight))].toString();
+                                    MediaStream.nativeHeight))].toString();
                     mScreenResTv.setText(String.format("分辨率:%s", title));
                     break;
                 default:
@@ -194,20 +194,20 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-//                RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
-//                    @Override
-//                    public void toFinishActivity() {
-//                        finish();
-//                    }
-//
-//                    @Override
-//                    public void toDoNext() {
-//                        if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
-//                            onStartOrStopPush();
-//                        }
-//
-//                    }
-//                });
+        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+            @Override
+            public void toFinishActivity() {
+                finish();
+            }
+
+            @Override
+            public void toDoNext() {
+                if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
+                    onStartOrStopPush();
+                }
+
+            }
+        });
         setContentView(R.layout.activity_main);
         initView();
         initSurfaceViewLayout(0);
@@ -1116,6 +1116,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         }
         return index;
     }
+
     /**
      * 初始化otg摄像头的布局
      */
@@ -1140,13 +1141,12 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             int uvcHeight = Hawk.get(HawkProperty.KEY_UVC_HEIGHT, MediaStream.uvcHeight);
             mScreenResTv.setText(String.format("%s%s%s%s", "分辨率:", uvcWidth, "x", uvcHeight));
         }
-//        initUvcLayout();
-//        try {
-//            Thread.sleep(200);
-//            initUvcLayout();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(500);
+            initUvcLayout();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         //        mScreenResTv.setVisibility(View.INVISIBLE);
         //        mSwitchOritation.setVisibility(View.INVISIBLE);

@@ -26,11 +26,11 @@ public class HandlerThreadHandler   extends Handler {
         return new HandlerThreadHandler(thread.getLooper());
     }
 
-    public static final HandlerThreadHandler createHandler(@Nullable Callback callback) {
+    public static final HandlerThreadHandler createHandler(@Nullable Handler.Callback callback) {
         return createHandler("HandlerThreadHandler", callback);
     }
 
-    public static final HandlerThreadHandler createHandler(String name, @Nullable Callback callback) {
+    public static final HandlerThreadHandler createHandler(String name, @Nullable Handler.Callback callback) {
         HandlerThread thread = new HandlerThread(name);
         thread.start();
         return new HandlerThreadHandler(thread.getLooper(), callback);
@@ -40,7 +40,7 @@ public class HandlerThreadHandler   extends Handler {
         super(looper);
     }
 
-    private HandlerThreadHandler(@NonNull Looper looper, @Nullable Callback callback) {
+    private HandlerThreadHandler(@NonNull Looper looper, @Nullable Handler.Callback callback) {
         super(looper, callback);
     }
 }
