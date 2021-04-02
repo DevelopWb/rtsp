@@ -131,19 +131,22 @@ public class MediaStream {
                     if (data == null)
                         return;
 
-                    int result;
-                    if (camInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                        result = (camInfo.orientation + mDgree) % 360;
-                    } else {  // back-facing
-                        result = (camInfo.orientation - mDgree + 360) % 360;
+                    int oritation =0;
+                    if (!StreamActivity.IS_VERTICAL_SCREEN) {
+                        oritation = 0;
+                    } else {
+                        if (mCameraId ==CAMERA_FACING_FRONT) {
+                            oritation = 270;
+                        }else {
+                            oritation = 90;
+                        }
                     }
-
                     if (i420_buffer == null || i420_buffer.length != data.length) {
                         i420_buffer = new byte[data.length];
                     }
 
                     JNIUtil.ConvertToI420(data, i420_buffer, nativeWidth, nativeHeight, 0, 0, nativeWidth,
-                            nativeHeight, result % 360, 2);
+                            nativeHeight, oritation, 2);
                     System.arraycopy(i420_buffer, 0, data, 0, data.length);
 
                     if (mRecordVC != null) {
