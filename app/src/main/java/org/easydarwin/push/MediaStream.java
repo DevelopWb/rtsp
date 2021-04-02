@@ -25,7 +25,6 @@ import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.UVCCamera;
 
 import org.easydarwin.audio.AudioStream;
-import org.easydarwin.bus.SupportResolution;
 import org.easydarwin.homepage.BackgroundCameraService;
 import org.easydarwin.easypusher.BuildConfig;
 import org.easydarwin.MyApp;
@@ -36,8 +35,6 @@ import org.easydarwin.util.SPUtil;
 import org.easydarwin.util.Util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
