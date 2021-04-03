@@ -6,6 +6,7 @@
 */
 package org.easydarwin.homepage;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,15 +19,29 @@ import android.widget.TextView;
 
 import com.basenetlib.util.NetWorkUtil;
 import com.juntai.wisdom.basecomponent.utils.ActivityManagerTool;
+import com.regmode.RegLatestContact;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.easydarwin.BaseProjectActivity;
 import org.easydarwin.easypusher.R;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * 启动页
  * */
 public class SplashActivity extends BaseProjectActivity {
-
+    String[] permissions = new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
     @Override
     public void onUvcCameraConnected() {
 
@@ -60,13 +75,29 @@ public class SplashActivity extends BaseProjectActivity {
 //                    }).show();
 //            return;
 //        }
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(new Intent(SplashActivity.this, StreamActivity.class));
-                SplashActivity.this.finish();
-            }
-        }, 2000);
+
+        new RxPermissions(this)
+                .request(permissions)
+                .delay(1, TimeUnit.SECONDS)
+                .compose(this.bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (aBoolean) {
+                            startActivity(new Intent(SplashActivity.this, StreamActivity.class));
+                           finish();
+
+                        } else {
+                            //有一个权限没通过
+                            finish();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                    }
+                });
+
 
         String versionName;
 
