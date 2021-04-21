@@ -40,6 +40,8 @@ import org.easydarwin.easypusher.databinding.ImagePickerItemBinding;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * 录像 / 抓拍
@@ -135,7 +137,7 @@ public class MediaFilesActivity extends AppCompatActivity implements Toolbar.OnM
 
             if (subFiles == null)
                 subFiles = new File[0];
-
+            Collections.reverse(Arrays.asList(subFiles));
             mSubFiles = subFiles;
             mImgHeight = (int) (getResources().getDisplayMetrics().density * 100 + 0.5f);
         }
@@ -189,7 +191,7 @@ public class MediaFilesActivity extends AppCompatActivity implements Toolbar.OnM
                                                     });
                                                     if (subFiles == null)
                                                         subFiles = new File[0];
-
+                                                    Collections.reverse(Arrays.asList(subFiles));
                                                     mSubFiles = subFiles;
                                                     notifyDataSetChanged();
                                                     Toast.makeText(getContext(),"已删除",Toast.LENGTH_SHORT).show();

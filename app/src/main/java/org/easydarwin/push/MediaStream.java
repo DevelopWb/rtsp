@@ -343,7 +343,7 @@ public class MediaStream {
             return;
         }
         boolean rotate = false;
-        if (mCamera == null) {
+        if (mCamera == null&& uvcCamera == null) {
             return;
         }
         long millis = PreferenceManager.getDefaultSharedPreferences(mContext).getInt("record_interval",

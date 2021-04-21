@@ -770,12 +770,12 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                             }
                             initSurfaceViewLayout(0);
                         } else {
-                            Hawk.put(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, position);
-                            Hawk.put(HawkProperty.KEY_UVC_WIDTH, Integer.parseInt(titles[0]));
-                            Hawk.put(HawkProperty.KEY_UVC_HEIGHT, Integer.parseInt(titles[1]));
-                            if (mMediaStream != null) {
-                                mMediaStream.updateResolution();
-                            }
+//                            Hawk.put(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, position);
+//                            Hawk.put(HawkProperty.KEY_UVC_WIDTH, Integer.parseInt(titles[0]));
+//                            Hawk.put(HawkProperty.KEY_UVC_HEIGHT, Integer.parseInt(titles[1]));
+//                            if (mMediaStream != null) {
+//                                mMediaStream.updateResolution();
+//                            }
                         }
                         mScreenResTv.setText("分辨率:" + title);
                         dialog.dismiss();
@@ -1082,7 +1082,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                 if (width < screenWidth) {
                     params.height = height * screenWidth / width * 2 / 5;
                 } else {
-                    params.height = height * width / screenWidth / 3;
+                    params.height = height * width / screenWidth*2 / 5;
                 }
             }
 
