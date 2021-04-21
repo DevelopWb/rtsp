@@ -85,7 +85,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
     public static final int REQUEST_STORAGE_PERMISSION = 1004;
     private CharSequence[] resDisplay = new CharSequence[]{"640x480", "1280x720", "1920x1080", "2560x1440",
             "3840x2160"};
-
+    private CharSequence[] resUvcDisplay = new CharSequence[]{"1280x720", "1920x1080"};
     TextView txtStreamAddress;
     TextView txtStatus, streamStat;
     TextView textRecordTick;
@@ -732,7 +732,12 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                 }
                 break;
             case R.id.txt_res:
-                setCameraRes(resDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2));
+                if (UVCCameraService.uvcConnected) {
+//                    setCameraRes(resUvcDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_UVC_RES_INDEX, 2));
+                } else {
+                    setCameraRes(resDisplay, Hawk.get(HawkProperty.KEY_SCREEN_PUSHING_RES_INDEX, 2));
+                }
+
                 break;
             case R.id.push_stream_ll:
                 onStartOrStopPush();
