@@ -43,7 +43,7 @@ android {
 
     android.applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "取证终端-" + variant.versionCode + "-" + variant.versionName + ".apk"
+            outputFileName = "隐蔽取证A-" + variant.versionCode + "-" + variant.versionName + ".apk"
         }
     }
 

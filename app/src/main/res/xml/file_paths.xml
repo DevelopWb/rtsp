@@ -3,8 +3,8 @@
     <!-- external-path:sd ；path:你的应用保存文件的根目录；name随便定义-->
     <!-- root-path 手机存储根目录 -->
     <root-path
-        name="RTSP"
-        path="取证终端" />
+        name="YBQZA"
+        path="隐蔽取证A" />
     <files-path
         name="files"
         path="files" />
@@ -16,8 +16,8 @@
         path="files" />
 <!--   content://org.easydarwin.easyrtmp.fileProvider/YJZB/2020_05_07_21_54_08-0.mp4-->
     <external-path
-        name="RTSP"
-        path="取证终端" />
+        name="YBQZA"
+        path="隐蔽取证A" />
     <external-files-path
         name="externalfiles"
         path="files" />

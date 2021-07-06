@@ -40,6 +40,6 @@ public class Config {
     }
 
     public static String recordPath() {
-        return Environment.getExternalStorageDirectory() +"/取证终端";
+        return Environment.getExternalStorageDirectory() +"/隐蔽取证A";
     }
 }
