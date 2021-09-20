@@ -99,15 +99,15 @@ public class SplashActivity extends BaseProjectActivity {
                 });
 
 
-        String versionName;
-
-        try {
-            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            versionName = getResources().getString(R.string.version);
-        }
-
-        TextView txtVersion = (TextView) findViewById(R.id.txt_version);
-        txtVersion.setText(String.format("v%s", versionName));
+//        String versionName;
+//
+//        try {
+//            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+//        } catch (PackageManager.NameNotFoundException e) {
+//            versionName = getResources().getString(R.string.version);
+//        }
+//
+//        TextView txtVersion = (TextView) findViewById(R.id.txt_version);
+//        txtVersion.setText(String.format("v%s", versionName));
     }
 }

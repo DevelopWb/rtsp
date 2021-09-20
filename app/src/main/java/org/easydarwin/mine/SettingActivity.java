@@ -64,7 +64,7 @@ public class SettingActivity extends AppCompatActivity implements Toolbar.OnMenu
         binding.pushServerIpEt.setText(SPUtil.getScreenPushingIP(this));
         binding.pushServerPortEt.setText(SPUtil.getScreenPushingPort(this));
         binding.quitAppBt.setOnClickListener(this);
-        binding.autoPushWhenRunCb.setChecked(Hawk.get(HawkProperty.AUTO_RUN,true));
+        binding.autoPushWhenRunCb.setChecked(Hawk.get(HawkProperty.AUTO_RUN,false));
         // 使能摄像头后台采集
         CheckBox backgroundPushing = (CheckBox) findViewById(R.id.enable_background_camera_pushing);
         backgroundPushing.setChecked(SPUtil.getEnableBackgroundCamera(this));

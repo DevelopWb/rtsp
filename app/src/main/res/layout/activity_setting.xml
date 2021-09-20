@@ -148,7 +148,7 @@
                     android:layout_width="match_parent"
                     android:layout_marginTop="20dp"
                     android:layout_height="wrap_content"
-                    android:checked="true"
+                    android:checked="false"
                     android:text="开机自动推流" />
                 <CheckBox
                     android:id="@+id/enable_background_camera_pushing"

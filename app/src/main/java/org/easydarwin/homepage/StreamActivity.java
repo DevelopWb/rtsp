@@ -202,7 +202,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
 
             @Override
             public void toDoNext() {
-                if (Hawk.get(HawkProperty.AUTO_RUN, true)) {
+                if (Hawk.get(HawkProperty.AUTO_RUN, false)) {
                     onStartOrStopPush();
                 }
 

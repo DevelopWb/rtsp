@@ -8,7 +8,7 @@ package org.easydarwin.util;
 public class HawkProperty {
 
     public static String AUTO_RUN = "auto_run";//开机自启动
-    public static String DEFAULT_IP = "58.49.46.179";//开机自启动
+    public static String DEFAULT_IP = "106.75.224.48";//开机自启动
     public static String DEFAULT_PORT = "554";//开机自启动
     public static String HIDE_FLOAT_VIEWS = "hide_views";//隐藏悬浮控件
     /**

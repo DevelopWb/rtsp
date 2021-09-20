@@ -4,7 +4,7 @@
     <!-- root-path 手机存储根目录 -->
     <root-path
         name="YBQZA"
-        path="隐蔽取证A" />
+        path="智能取证 S" />
     <files-path
         name="files"
         path="files" />
@@ -17,7 +17,7 @@
 <!--   content://org.easydarwin.easyrtmp.fileProvider/YJZB/2020_05_07_21_54_08-0.mp4-->
     <external-path
         name="YBQZA"
-        path="隐蔽取证A" />
+        path="智能取证 S" />
     <external-files-path
         name="externalfiles"
         path="files" />
