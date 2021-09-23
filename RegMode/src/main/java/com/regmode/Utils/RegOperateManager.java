@@ -71,7 +71,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class RegOperateManager extends BaseReg implements RequestStatus {
-    public static String APP_MARK = "QZYH";//软件标识
+    public static String APP_MARK = "ZNQZS_CN";//软件标识
     private CommonProgressDialog mProgressDialog;
     private String nearestVersion;
     private Context context;
