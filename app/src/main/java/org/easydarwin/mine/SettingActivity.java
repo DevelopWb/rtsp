@@ -78,8 +78,8 @@ public class SettingActivity extends AppCompatActivity implements Toolbar.OnMenu
                         } else {
                             new AlertDialog
                                     .Builder(SettingActivity.this)
-                                    .setTitle("后台上传视频")
-                                    .setMessage("后台上传视频需要APP出现在顶部.是否确定?")
+                                    .setTitle("摄像头后台采集")
+                                    .setMessage("摄像头后台采集需要APP出现在顶部.是否确定?")
                                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {

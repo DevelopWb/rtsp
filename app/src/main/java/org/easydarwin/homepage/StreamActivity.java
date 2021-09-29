@@ -194,20 +194,20 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
-            @Override
-            public void toFinishActivity() {
-                finish();
-            }
-
-            @Override
-            public void toDoNext() {
-                if (Hawk.get(HawkProperty.AUTO_RUN, false)) {
-                    onStartOrStopPush();
-                }
-
-            }
-        });
+//        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+//            @Override
+//            public void toFinishActivity() {
+//                finish();
+//            }
+//
+//            @Override
+//            public void toDoNext() {
+//                if (Hawk.get(HawkProperty.AUTO_RUN, false)) {
+//                    onStartOrStopPush();
+//                }
+//
+//            }
+//        });
         setContentView(R.layout.activity_main);
         initView();
         initSurfaceViewLayout(0);
@@ -459,9 +459,9 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             if (ms.isStreaming()) {
                 String url = Config.getServerURL(this);
 
-                txtStreamAddress.setText(url);
+//                txtStreamAddress.setText(url);
 
-                sendMessage("推流中");
+                sendMessage("取证中");
 
                 ImageView startPush = findViewById(R.id.streaming_activity_push);
                 startPush.setImageResource(R.drawable.start_push_pressed);
@@ -485,8 +485,8 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         mMediaStream.startPreview();
 
         if (mMediaStream.isStreaming()) {
-            sendMessage("推流中");
-            txtStreamAddress.setText(Config.getServerURL(this));
+            sendMessage("取证中");
+//            txtStreamAddress.setText(Config.getServerURL(this));
         }
     }
 
@@ -908,7 +908,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
                             sendMessage("连接异常中断");
                             break;
                         case EasyPusher.OnInitPusherCallback.CODE.EASY_PUSH_STATE_PUSHING:
-                            sendMessage("推流中");
+                            sendMessage("取证中");
                             break;
                         case EasyPusher.OnInitPusherCallback.CODE.EASY_PUSH_STATE_DISCONNECTED:
                             sendMessage("断开连接");
@@ -927,7 +927,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
             });
 
             mPushStreamIv.setImageResource(R.drawable.start_push_pressed);
-            txtStreamAddress.setText(url);
+//            txtStreamAddress.setText(url);
         } else {
             mMediaStream.stopStream();
             mPushStreamIv.setImageResource(R.drawable.start_push);
@@ -960,7 +960,7 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
      * */
     public void onSetting(View view) {
         if (mMediaStream != null && mMediaStream.isStreaming()) {
-            ToastUtils.toast(mContext, "推流中,无法进入设置界面");
+            ToastUtils.toast(mContext, "取证中,无法进入设置界面");
             return;
         }
         Intent intent = new Intent(this, SettingActivity.class);
