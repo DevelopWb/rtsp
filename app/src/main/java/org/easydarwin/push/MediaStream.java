@@ -31,6 +31,7 @@ import org.easydarwin.MyApp;
 import org.easydarwin.homepage.StreamActivity;
 import org.easydarwin.muxer.EasyMuxer;
 import org.easydarwin.sw.JNIUtil;
+import org.easydarwin.util.Config;
 import org.easydarwin.util.SPUtil;
 import org.easydarwin.util.Util;
 
@@ -170,11 +171,11 @@ public class MediaStream {
     }
 
     public void startStream(String ip, String port, String id, InitCallback callback) {
-        if (enanleVideo) {
-            mEasyPusher.initPush("", mContext, callback);
-        } else {
-            mEasyPusher.initPush("", mContext, callback, ~0);
-        }
+//        if (enanleVideo) {
+        ////            mEasyPusher.initPush(Config.getServerURL(mContext), mContext, callback);
+        ////        } else {
+        ////            mEasyPusher.initPush(Config.getServerURL(mContext), mContext, callback, ~0);
+        ////        }
         mEasyPusher.initPush(mContext, callback);
         mEasyPusher.setMediaInfo(Pusher.Codec.EASY_SDK_VIDEO_CODEC_H264, 25, Pusher.Codec.EASY_SDK_AUDIO_CODEC_AAC, 1
                 , 8000, 16);

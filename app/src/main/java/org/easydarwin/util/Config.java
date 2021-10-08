@@ -23,7 +23,8 @@ public class Config {
     public static UsbDevice usbDevice = null;
 
     public static String getServerURL(Context context) {
-        return String.format("rtsp://%s:%s/%s",getIp(context),getPort(context),(String) Hawk.get(HawkProperty.REG_CODE));
+        return String.format("rtsp://%s:%s/%s.sdp",getIp(context),getPort(context),
+                (String) Hawk.get(HawkProperty.REG_CODE));
     }
 
 
