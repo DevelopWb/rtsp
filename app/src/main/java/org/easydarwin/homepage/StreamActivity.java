@@ -194,20 +194,20 @@ public class StreamActivity extends BaseProjectActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         super.onCreate(savedInstanceState);
-//        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
-//            @Override
-//            public void toFinishActivity() {
-//                finish();
-//            }
-//
-//            @Override
-//            public void toDoNext() {
-//                if (Hawk.get(HawkProperty.AUTO_RUN, false)) {
-//                    onStartOrStopPush();
-//                }
-//
-//            }
-//        });
+        RegOperateManager.getInstance(this).setCancelCallBack(new RegLatestContact.CancelCallBack() {
+            @Override
+            public void toFinishActivity() {
+                finish();
+            }
+
+            @Override
+            public void toDoNext() {
+                if (Hawk.get(HawkProperty.AUTO_RUN, false)) {
+                    onStartOrStopPush();
+                }
+
+            }
+        });
         setContentView(R.layout.activity_main);
         initView();
         initSurfaceViewLayout(0);
