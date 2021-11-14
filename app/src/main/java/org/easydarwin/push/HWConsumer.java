@@ -10,6 +10,7 @@ import android.util.Log;
 import org.easydarwin.easypusher.BuildConfig;
 import org.easydarwin.muxer.EasyMuxer;
 import org.easydarwin.sw.JNIUtil;
+import org.easydarwin.util.SPUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -226,23 +227,31 @@ Video frame rate 20 fps 30 fps 30 fps 30 fps
 Video bitrate 384 Kbps 2 Mbps 4 Mbps 10 Mbps
         */
         int framerate = 30;
-//        if (width == 640 || height == 640) {
+        /**
+         * 原始的
+         */
+        //        if (width == 640 || height == 640) {
 //            bitrate = 2000000;
 //        } else if (width == 1280 || height == 1280) {
 //            bitrate = 4000000;
 //        } else {
 //            bitrate = 2 * width * height;
 //        }
-
-        int bitrate = (int) (mWidth * mHeight * 20 * 4 * 0.05f);
-
-        if (mWidth >= 1920 || mHeight >= 1920)
-            bitrate *= 0.6;
-        else if (mWidth >= 1280 || mHeight >= 1280)
-            bitrate *= 0.4;
-        else if (mWidth >= 720 || mHeight >= 720)
-            bitrate *= 0.3;
-
+//        /**
+//         * 自己改的
+//         */
+//                int bitrate = (int) (mWidth * mHeight * 20 * 4 * 0.05f);
+//
+//        if (mWidth >= 1920 || mHeight >= 1920)
+//            bitrate *= 0.1;
+//        else if (mWidth >= 1280 || mHeight >= 1280)
+//            bitrate *= 0.4;
+//        else if (mWidth >= 720 || mHeight >= 720)
+//            bitrate *= 0.6;
+        /**
+         * 改成和rtmp一样
+         */
+        int bitrate = 72 * 1000 + SPUtil.getBitrateKbps(mContext);
         try {
             mMediaCodec = MediaCodec.createByCodecName(info.mName);
         } catch (IOException e) {
